@@ -1,4 +1,4 @@
-; @desc     Basic bootloader: load kernel from disk, witch to protected mode and transfer control to kernel.
+; @desc     Basic boot sector: load kernel from disk, witch to protected mode and transfer control to kernel.
 ; @author   Davide Della Giustina
 ; @date     14/11/2019
 

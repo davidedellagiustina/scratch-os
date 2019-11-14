@@ -32,8 +32,8 @@ all: run # Default target
 #src/kernel/kernel.bin: src/boot/kloader.o $(OBJ)
 #	$(SH) $(SFLAGS) -c "$(LD) -Ttext 0x1000 $^ -o $@ --oformat-binary"
 
-#out/os-image.bin: src/boot/bootloader.bin src/kernel/kernel.bin
-out/os-image.bin: src/boot/bootloader.bin
+#out/os-image.bin: src/boot/bootsect.bin src/kernel/kernel.bin
+out/os-image.bin: src/boot/bootsect.bin
 	$(SH) $(SFLAGS) -c "cat $^ > $@"
 
 run: out/os-image.bin
