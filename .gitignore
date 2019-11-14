@@ -1,0 +1,5 @@
+src/boot/*.o
+src/boot/*.bin
+src/kernel/*.o
+src/kernel/*.bin
+out/os-image.bin
