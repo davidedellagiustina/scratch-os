@@ -15,6 +15,7 @@ LD = i386-elf-ld
 
 .PHONY: all
 .PHONY: run
+.PHONY: vbox
 .PHNOY: clean
 
 all: run # Default target
@@ -38,6 +39,10 @@ out/os-image.bin: src/boot/bootloader.bin
 run: out/os-image.bin
 	qemu $<
 
+vbox: out/os-image.bin
+	$(SH) $(SFLAGS) -c "dd if=/dev/zero of=out/floppy.img ibs=1k count=1440"
+	$(SH) $(SFLAGS) -c "dd if=$< of=out/floppy.img conv=notrunc"
+
 clean:
 	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin
-	rm -rf out/os-image.bin
+	rm -rf out/os-image.bin out/floppy.img
