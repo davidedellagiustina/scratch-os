@@ -1,3 +1,4 @@
+os-dev.pdf
 src/boot/*.o
 src/boot/*.bin
 src/kernel/*.o
