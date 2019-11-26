@@ -4,6 +4,7 @@
 
 [bits 16]
 
+; @param bx     Pointer to (null-terminated) string to be printed
 print:
     pusha
     mov ah, 0x0e
