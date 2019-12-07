@@ -18,7 +18,7 @@ LD = i386-elf-ld
 .PHONY: vbox
 .PHNOY: clean
 
-all: run # Default target
+all: out/os-image.bin # Default target
 
 %.bin: %.asm
 	$(SH) $(SFLAGS) -c "nasm -fbin $< -o $@"
@@ -26,22 +26,21 @@ all: run # Default target
 %.o: %.asm
 	$(SH) $(SFLAGS) -c "nasm -felf $< -o $@"
 
-#%.o: %.c $(C_HEADERS)
-#	$(SH) $(SFLAGS) -c "$(CC) $(CFLAGS) -ffreestanding -c $< -o $@"
+%.o: %.c $(C_HEADERS)
+	$(SH) $(SFLAGS) -c "$(CC) $(CFLAGS) -ffreestanding -c $< -o $@"
 
-#src/kernel/kernel.bin: src/boot/kloader.o $(OBJ)
-#	$(SH) $(SFLAGS) -c "$(LD) -Ttext 0x1000 $^ -o $@ --oformat-binary"
+src/kernel/kernel.bin: src/kernel/kernel_entry.o $(OBJ)
+	$(SH) $(SFLAGS) -c "$(LD) -Ttext 0x1000 $^ -o $@ --oformat binary"
 
-#out/os-image.bin: src/boot/bootsect.bin src/kernel/kernel.bin
-out/os-image.bin: src/boot/bootsect.bin
+out/os-image.bin: src/boot/bootsect.bin src/kernel/kernel.bin
 	$(SH) $(SFLAGS) -c "cat $^ > $@"
 
-run: out/os-image.bin
-	qemu $<
+run: all
+	qemu out/os-image.bin
 
-vbox: out/os-image.bin
+vbox: all
 	$(SH) $(SFLAGS) -c "dd if=/dev/zero of=out/floppy.img ibs=1k count=1440"
-	$(SH) $(SFLAGS) -c "dd if=$< of=out/floppy.img conv=notrunc"
+	$(SH) $(SFLAGS) -c "dd if=out/os-image.bin of=out/floppy.img conv=notrunc"
 
 clean:
 	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin

@@ -4,6 +4,8 @@
 
 [org 0x7c00]
 
+KERNEL_OFFSET equ 0x1000
+
 [bits 16]
 
 jmp init
@@ -22,9 +24,18 @@ init:
     mov [BOOT_DRIVE], dl ; Boot drive number is stored by the BIOS
     mov bp, 0x9000 ; Stack
     mov sp, bp
-    mov bx, BOOTING_OS_MSG
+    mov bx, BOOTING_OS_MSG ; Boot message
     call print
-    call switch_to_pm
+    call load_kernel ; Load kernel into memory
+    call switch_to_pm ; Switch to protected mode
+
+; Load kernel into memory
+load_kernel:
+    mov bx, KERNEL_OFFSET
+    mov dh, 1
+    mov dl, [BOOT_DRIVE]
+    call loaddisk
+    ret
 
 ; Switch to protected mode
 switch_to_pm:
@@ -51,13 +62,11 @@ pm_init:
 
 ; Main routine
 main:
-    mov ebx, TEST_MSG
-    call pm_print
+    call KERNEL_OFFSET
     jmp $
 
 BOOT_DRIVE: db 0
 BOOTING_OS_MSG: db 'Booting OwlOs...', 0
-TEST_MSG: db 'Test from PM', 0
 
 times 510-($-$$) db 0
 dw 0xaa55 ; Magic number
