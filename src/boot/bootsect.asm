@@ -32,7 +32,7 @@ init:
 ; Load kernel into memory
 load_kernel:
     mov bx, KERNEL_OFFSET
-    mov dh, 1
+    mov dh, 3
     mov dl, [BOOT_DRIVE]
     call loaddisk
     ret

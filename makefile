@@ -3,8 +3,8 @@
 # @date		14/11/2019
 
 
-C_SOURCES = $(wildcard src/kernel/*.c)
-C_HEADERS = $(wildcard src/kernel/*.h)
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c)
+C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h)
 OBJ = $(C_SOURCES:.c=.o) # Extension replacement
 
 SH = bash
@@ -43,5 +43,5 @@ vbox: all
 	$(SH) $(SFLAGS) -c "dd if=out/os-image.bin of=out/floppy.img conv=notrunc"
 
 clean:
-	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin
+	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o
 	rm -rf out/os-image.bin out/floppy.img
