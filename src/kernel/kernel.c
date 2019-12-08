@@ -7,5 +7,4 @@
 void kmain() {
     clear_screen();
     kprint("Hello world!\n");
-    kprint_at("Test scroll\nLet's see...", 24, 0);
 }
