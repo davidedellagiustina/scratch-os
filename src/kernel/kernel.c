@@ -2,7 +2,7 @@
 // @author   Davide Della Giustina
 // @date     07/12/2019
 
-#include "../drivers/screen.h"
+#include "../drivers/vga.h"
 
 void kmain() {
     clear_screen();

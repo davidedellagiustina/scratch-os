@@ -4,7 +4,7 @@
 
 #include "../kernel/utils.h"
 #include "../kernel/ports.h"
-#include "screen.h"
+#include "vga.h"
 
 // Private functions
 unsigned char get_attribute(vga_color fg, vga_color bg);
