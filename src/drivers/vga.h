@@ -5,6 +5,10 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
+#include "../cpu/types.h"
+#include "../kernel/utils.h"
+#include "../kernel/ports.h"
+
 static const int VIDEO_ADDRESS = 0xb8000;
 
 static const int MAX_ROWS = 25;
@@ -41,7 +45,7 @@ typedef enum vga_color {
  * @param row       Cursor row index.
  * @param col       Cursor column index.
  */
-void kprint_at(char *msg, int row, int col);
+void kprint_at(char *msg, int32_t row, int32_t col);
 
 /* Print a string at the current cursor position.
  * @param msg       String to print.

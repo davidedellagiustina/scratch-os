@@ -43,5 +43,5 @@ vbox: all
 	$(SH) $(SFLAGS) -c "dd if=out/os-image.bin of=out/floppy.img conv=notrunc"
 
 clean:
-	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o
+	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o src/cpu/*.o
 	rm -rf out/os-image.bin out/floppy.img

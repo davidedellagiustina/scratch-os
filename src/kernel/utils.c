@@ -9,8 +9,8 @@
  * @param destination   Destination address.
  * @param nr_bytes      Number of bytes to copy.
  */
-inline void memory_copy(unsigned char *source, unsigned char *destination, unsigned int nr_bytes) {
-    unsigned int i;
+inline void memory_copy(unsigned char *source, unsigned char *destination, uint32_t nr_bytes) {
+    uint32_t i;
     for (i = 0; i < nr_bytes; ++i) {
         *(destination + i) = *(source + i);
     }

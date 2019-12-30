@@ -1,8 +1,14 @@
 os-dev.pdf
+
 src/boot/*.o
 src/boot/*.bin
+
+src/cpu/*.o
+
 src/kernel/*.o
 src/kernel/*.bin
+
 src/drivers/*.o
+
 out/os-image.bin
 out/floppy.img
