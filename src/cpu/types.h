@@ -1,4 +1,4 @@
-// @desc     Some useful custom types.
+// @desc     Some useful custom types
 // @author   Davide Della Giustina
 // @date     30/12/2019
 

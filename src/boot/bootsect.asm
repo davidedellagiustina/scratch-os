@@ -32,7 +32,7 @@ init:
 ; Load kernel into memory
 load_kernel:
     mov bx, KERNEL_OFFSET
-    mov dh, 3
+    mov dh, KERNEL_SECTORS_SIZE ; This variable is defined by the assembler at compile-time
     mov dl, [BOOT_DRIVE]
     call loaddisk
     ret

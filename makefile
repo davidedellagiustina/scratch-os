@@ -3,9 +3,12 @@
 # @date		14/11/2019
 
 
-C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c)
-C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h)
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c)
+C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h)
 OBJ = $(C_SOURCES:.c=.o) # Extension replacement
+
+KERNEL_SIZE = $$(wc -c < 'src/kernel/kernel.bin') # Compute kernel size (in bytes)
+KERNEL_SECTORS_SIZE = $$((($(KERNEL_SIZE)+511)/512)) # Compute kernel size (in sectors)
 
 SH = bash
 SFLAGS = -i
@@ -20,8 +23,8 @@ LD = i386-elf-ld
 
 all: out/os-image.bin # Default target
 
-%.bin: %.asm
-	$(SH) $(SFLAGS) -c "nasm -fbin $< -o $@"
+%.bin: %.asm src/kernel/kernel.bin
+	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) $< -o $@"
 
 %.o: %.asm
 	$(SH) $(SFLAGS) -c "nasm -felf $< -o $@"
