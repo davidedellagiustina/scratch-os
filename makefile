@@ -5,7 +5,7 @@
 
 C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c)
 C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h)
-OBJ = $(C_SOURCES:.c=.o) # Extension replacement
+OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
 
 KERNEL_SIZE = $$(wc -c < 'src/kernel/kernel.bin') # Compute kernel size (in bytes)
 KERNEL_SECTORS_SIZE = $$((($(KERNEL_SIZE)+511)/512)) # Compute kernel size (in sectors)

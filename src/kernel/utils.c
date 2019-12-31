@@ -9,9 +9,57 @@
  * @param destination   Destination address.
  * @param nr_bytes      Number of bytes to copy.
  */
-inline void memory_copy(unsigned char *source, unsigned char *destination, uint32_t nr_bytes) {
-    uint32_t i;
+void memory_copy(unsigned char *source, unsigned char *destination, int32_t nr_bytes) {
+    int32_t i;
     for (i = 0; i < nr_bytes; ++i) {
         *(destination + i) = *(source + i);
     }
+}
+
+/* Set a certain portion of memory to a value.
+ * @param dest          Base memory address.
+ * @para, val           Value to set.
+ * @param len           Length of memory portion.
+ */
+void memory_set(uint8_t *dest, uint8_t val, int32_t len) {
+    uint8_t *temp = dest;
+    for (; len != 0; --len) *temp++ = val;
+}
+
+/* Swap two 8 bit integers in memory.
+ * @param a             First parameter.
+ * @param b             Second parameter.
+ */
+void swap(uint8_t *a, uint8_t *b) {
+    uint8_t tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+/* Reverse a string.
+ * @param str           String to reverse.
+ * @param length        Length of characters to reverse.
+ */
+void str_reverse(char str[], int32_t length) {
+    int32_t start = 0, end = length - 1;
+    while (start < end) {
+        swap(str+start, str+end);
+        ++start; --end;
+    }
+}
+
+/* Convert an integer value to an ASCII string.
+ * @param n             Integer value.
+ * @param str           String to put the value to.
+ */
+void int_to_ascii(int32_t n, char str[]) {
+    int32_t i, sign;
+    if ((sign = n) < 0) n = -n;
+    i = 0;
+    do {
+        str[i++] = n % 10 + '0';
+    } while ((n /= 10) > 0);
+    if (sign < 0) str[i++] = '-';
+    str[i] = '\0';
+    str_reverse(str, i);
 }
