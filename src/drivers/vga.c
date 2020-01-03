@@ -1,4 +1,4 @@
-// @desc     Screen driver.
+// @desc     Screen driver
 // @author   Davide Della Giustina
 // @date     07/12/2019
 

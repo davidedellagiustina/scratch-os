@@ -10,12 +10,12 @@ isr_common_stub:
     pusha ; Push edi, esi, ebp, esp, ebx, edx, ecx, eax
     mov ax, ds
     push eax ; Save data segment descriptor
-    mov ax, 0x10 ; Kernel data segment descriptor
+    mov ax, 0x10 ; Kernel data segment descriptor, defined in GDT (entry #2, excluding the very first null entry)
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-    ; 2) Call C handler
+    ; 2) Call generic C handler function
     call isr_handler
     ; 3) Restore state
     pop eax
@@ -26,7 +26,7 @@ isr_common_stub:
     popa
     add esp, 8 ; Clean up the pushed error code and ISR number
     sti
-    iret ; Pops cs, eip, eflags, ss, esp
+    iret ; Pops cs, eip, eflags, ss, esp, then returns from interrupt
 
 global isr0
 global isr1

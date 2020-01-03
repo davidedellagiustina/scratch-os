@@ -1,4 +1,4 @@
-# @desc		Makefile for compiling and running the entire operating system.
+# @desc		Makefile for compiling and running the entire operating system
 # @author	Davide Della Giustina
 # @date		14/11/2019
 

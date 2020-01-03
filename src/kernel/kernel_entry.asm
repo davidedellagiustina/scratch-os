@@ -1,4 +1,4 @@
-; @desc     Kernel entry: kall kmain label.
+; @desc     Kernel entry: kall kmain label
 ; @author   Davide Della Giustina
 ; @date     07/12/2019
 

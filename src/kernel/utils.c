@@ -1,4 +1,4 @@
-// @desc     Kernel useful functions.
+// @desc     Kernel useful functions
 // @author   Davide Della Giustina
 // @date     08/12/2019
 

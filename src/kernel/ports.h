@@ -1,4 +1,4 @@
-// @desc     Low level basic driver: ports in / out.
+// @desc     Low level basic driver: ports in / out
 // @author   Davide Della Giustina
 // @date     07/12/2019
 
