@@ -13,20 +13,20 @@ isr_t interrupt_handlers[IDT_ENTRIES];
 void remap_pic(uint32_t offset_master, uint32_t offset_slave) {
     // Save current masks
     uint8_t mask_master, mask_slave;
-    mask_master = port_byte_in(PIC_MASTER_DATA);
-    mask_slave = port_byte_in(PIC_SLAVE_DATA);
+    mask_master = inb(PIC_MASTER_DATA);
+    mask_slave = inb(PIC_SLAVE_DATA);
     // Initialize PICs
-    port_byte_out(PIC_MASTER_COMMAND, 0x10 | 0x01); // Start initialization
-    port_byte_out(PIC_SLAVE_COMMAND, 0x10 | 0x01);
-    port_byte_out(PIC_MASTER_DATA, offset_master);
-    port_byte_out(PIC_SLAVE_DATA, offset_slave);
-    port_byte_out(PIC_MASTER_DATA, 4); // Tell master PIC that there is a slave at IRQ2
-    port_byte_out(PIC_SLAVE_DATA, 2); // Tell slave PIC its identity
-    port_byte_out(PIC_MASTER_DATA, 0x01); // 8086/88 mode
-    port_byte_out(PIC_SLAVE_DATA, 0x01);
+    outb(PIC_MASTER_COMMAND, 0x10 | 0x01); // Start initialization
+    outb(PIC_SLAVE_COMMAND, 0x10 | 0x01);
+    outb(PIC_MASTER_DATA, offset_master);
+    outb(PIC_SLAVE_DATA, offset_slave);
+    outb(PIC_MASTER_DATA, 4); // Tell master PIC that there is a slave at IRQ2
+    outb(PIC_SLAVE_DATA, 2); // Tell slave PIC its identity
+    outb(PIC_MASTER_DATA, 0x01); // 8086/88 mode
+    outb(PIC_SLAVE_DATA, 0x01);
     // Restore masks
-    port_byte_out(PIC_MASTER_DATA, mask_master);
-    port_byte_out(PIC_SLAVE_DATA, mask_slave);
+    outb(PIC_MASTER_DATA, mask_master);
+    outb(PIC_SLAVE_DATA, mask_slave);
 }
 
 /* Setup IDT gate for every interrupt, then load IDT descriptor.
@@ -149,8 +149,8 @@ void register_interrupt_handler(uint8_t n, isr_t handler) {
 }
 
 void irq_handler(registers_t r) {
-    if (r.int_no >= 40) port_byte_out(PIC_SLAVE_COMMAND, 0x20); // EOI (End Of Interrupt)
-    port_byte_out(PIC_MASTER_COMMAND, 0x20);
+    if (r.int_no >= 40) outb(PIC_SLAVE_COMMAND, 0x20); // EOI (End Of Interrupt)
+    outb(PIC_MASTER_COMMAND, 0x20);
     if (interrupt_handlers[r.int_no] != 0) {
         isr_t handler = interrupt_handlers[r.int_no];
         handler(r);

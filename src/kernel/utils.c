@@ -36,12 +36,20 @@ void swap(uint8_t *a, uint8_t *b) {
     *b = tmp;
 }
 
+/* Compute the length of a string.
+ * @param str           String.
+ */
+int32_t strlen (char str[]) {
+    uint32_t i = 0;
+    while (str[i] != '\0') ++i;
+    return i;
+}
+
 /* Reverse a string.
  * @param str           String to reverse.
- * @param length        Length of characters to reverse.
  */
-void str_reverse(char str[], int32_t length) {
-    int32_t start = 0, end = length - 1;
+void reverse(char str[]) {
+    int32_t start = 0, end = strlen(str) - 1;
     while (start < end) {
         swap(str+start, str+end);
         ++start; --end;
@@ -61,5 +69,5 @@ void int_to_ascii(int32_t n, char str[]) {
     } while ((n /= 10) > 0);
     if (sign < 0) str[i++] = '-';
     str[i] = '\0';
-    str_reverse(str, i);
+    reverse(str);
 }

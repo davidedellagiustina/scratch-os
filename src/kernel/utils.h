@@ -27,11 +27,15 @@ void memory_set(uint8_t *dest, uint8_t val, int32_t len);
  */
 void swap(uint8_t *a, uint8_t *b);
 
+/* Compute the length of a string.
+ * @param str           String.
+ */
+int32_t strlen (char str[]);
+
 /* Reverse a string.
  * @param str           String to reverse.
- * @param length        Length of characters to reverse.
  */
-void str_reverse(char str[], int32_t length);
+void reverse(char str[]);
 
 /* Convert an integer value to an ASCII string.
  * @param n             Integer value.

@@ -9,8 +9,8 @@
 
 void kmain() {
     isr_install(); // Install interrupts (i.e. load the IDT descriptor)
-    clear_screen();
-    kprint("Hello world!\n");
-    __asm__ __volatile__("int $2");
-    __asm__ __volatile__("int $3");
+    asm volatile("sti");
+    init_timer(50);
+    // clear_screen();
+    // kprint("Hello world!\n");
 }

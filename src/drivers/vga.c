@@ -66,10 +66,10 @@ uint8_t get_attribute(vga_color fg, vga_color bg) {
  * @return          Current cursor position (memory offset).
  */
 uint32_t get_cursor_offset() {
-    port_byte_out(REG_SCREEN_CTRL, 14); // Request higher byte
-    uint32_t offset = port_byte_in(REG_SCREEN_DATA) << 8;
-    port_byte_out(REG_SCREEN_CTRL, 15); // Request lower byte
-    offset += port_byte_in(REG_SCREEN_DATA);
+    outb(REG_SCREEN_CTRL, 14); // Request higher byte
+    uint32_t offset = inb(REG_SCREEN_DATA) << 8;
+    outb(REG_SCREEN_CTRL, 15); // Request lower byte
+    offset += inb(REG_SCREEN_DATA);
     return (2 * offset);
 }
 
@@ -78,10 +78,10 @@ uint32_t get_cursor_offset() {
  */
 void set_cursor_offset(uint32_t offset) {
     offset /= 2;
-    port_byte_out(REG_SCREEN_CTRL, 14);
-    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
-    port_byte_out(REG_SCREEN_CTRL, 15);
-    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xff));
+    outb(REG_SCREEN_CTRL, 14);
+    outb(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
+    outb(REG_SCREEN_CTRL, 15);
+    outb(REG_SCREEN_DATA, (uint8_t)(offset & 0xff));
 }
 
 /* Compute memory offset basing on row/col indexes.
