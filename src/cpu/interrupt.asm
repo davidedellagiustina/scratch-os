@@ -332,7 +332,7 @@ irq0:
 irq1:
     cli
     push byte 1
-    push byte 32
+    push byte 33
     jmp irq_common_stub
 
 irq2:

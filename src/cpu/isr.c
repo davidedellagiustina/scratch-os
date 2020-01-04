@@ -25,8 +25,10 @@ void remap_pic(uint32_t offset_master, uint32_t offset_slave) {
     outb(PIC_MASTER_DATA, 0x01); // 8086/88 mode
     outb(PIC_SLAVE_DATA, 0x01);
     // Restore masks
-    outb(PIC_MASTER_DATA, mask_master);
-    outb(PIC_SLAVE_DATA, mask_slave);
+    // outb(PIC_MASTER_DATA, mask_master);
+    // outb(PIC_SLAVE_DATA, mask_slave);
+    outb(PIC_MASTER_DATA, 0x00);
+    outb(PIC_SLAVE_DATA, 0x00);
 }
 
 /* Setup IDT gate for every interrupt, then load IDT descriptor.

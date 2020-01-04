@@ -24,6 +24,7 @@ LD = i386-elf-ld
 all: out/os-image.bin # Default target
 
 %.bin: %.asm src/kernel/kernel.bin
+	$(SH) $(FLAGS) -c "echo Kernel takes $(KERNEL_SECTORS_SIZE) sectors"
 	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) $< -o $@"
 
 %.o: %.asm
