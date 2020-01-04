@@ -4,9 +4,35 @@
 
 #include "isr.h"
 
+isr_t interrupt_handlers[IDT_ENTRIES];
+
+/* Remap the PICs to the desired offsets.
+ * @param offset_master         New offset for the master PIC.
+ * @param offset_slave          New offset for the slave PIC.
+ */
+void remap_pic(uint32_t offset_master, uint32_t offset_slave) {
+    // Save current masks
+    uint8_t mask_master, mask_slave;
+    mask_master = port_byte_in(PIC_MASTER_DATA);
+    mask_slave = port_byte_in(PIC_SLAVE_DATA);
+    // Initialize PICs
+    port_byte_out(PIC_MASTER_COMMAND, 0x10 | 0x01); // Start initialization
+    port_byte_out(PIC_SLAVE_COMMAND, 0x10 | 0x01);
+    port_byte_out(PIC_MASTER_DATA, offset_master);
+    port_byte_out(PIC_SLAVE_DATA, offset_slave);
+    port_byte_out(PIC_MASTER_DATA, 4); // Tell master PIC that there is a slave at IRQ2
+    port_byte_out(PIC_SLAVE_DATA, 2); // Tell slave PIC its identity
+    port_byte_out(PIC_MASTER_DATA, 0x01); // 8086/88 mode
+    port_byte_out(PIC_SLAVE_DATA, 0x01);
+    // Restore masks
+    port_byte_out(PIC_MASTER_DATA, mask_master);
+    port_byte_out(PIC_SLAVE_DATA, mask_slave);
+}
+
 /* Setup IDT gate for every interrupt, then load IDT descriptor.
  */
 void isr_install() {
+    // Register ISR handlers
     set_idt_gate(0, (uint32_t)isr0);
     set_idt_gate(1, (uint32_t)isr1);
     set_idt_gate(2, (uint32_t)isr2);
@@ -39,7 +65,27 @@ void isr_install() {
     set_idt_gate(29, (uint32_t)isr29);
     set_idt_gate(30, (uint32_t)isr30);
     set_idt_gate(31, (uint32_t)isr31);
-    set_idt(); // Load IDT in memory
+    // Remap PIC
+    remap_pic(0x20, 0x28); // Remap master PIC to 0x20-0x27, slave PIC to 0x28-0x2f
+    // Register IRQ handlers
+    set_idt_gate(32, (uint32_t)irq0);
+    set_idt_gate(33, (uint32_t)irq1);
+    set_idt_gate(34, (uint32_t)irq2);
+    set_idt_gate(35, (uint32_t)irq3);
+    set_idt_gate(36, (uint32_t)irq4);
+    set_idt_gate(37, (uint32_t)irq5);
+    set_idt_gate(38, (uint32_t)irq6);
+    set_idt_gate(39, (uint32_t)irq7);
+    set_idt_gate(40, (uint32_t)irq8);
+    set_idt_gate(41, (uint32_t)irq9);
+    set_idt_gate(42, (uint32_t)irq10);
+    set_idt_gate(43, (uint32_t)irq11);
+    set_idt_gate(44, (uint32_t)irq12);
+    set_idt_gate(45, (uint32_t)irq13);
+    set_idt_gate(46, (uint32_t)irq14);
+    set_idt_gate(47, (uint32_t)irq15);
+    // Load IDT in memory
+    set_idt();
 }
 
 // Excptions messages
@@ -92,4 +138,21 @@ void isr_handler(registers_t r) {
     kprint(": ");
     kprint(exception_messages[r.int_no]);
     kprint("\n");
+}
+
+/* Register an IRQ handler
+ * @param n                     Interrupt number.
+ * @param handler               Handler function.
+ */
+void register_interrupt_handler(uint8_t n, isr_t handler) {
+    interrupt_handlers[n] = handler;
+}
+
+void irq_handler(registers_t r) {
+    if (r.int_no >= 40) port_byte_out(PIC_SLAVE_COMMAND, 0x20); // EOI (End Of Interrupt)
+    port_byte_out(PIC_MASTER_COMMAND, 0x20);
+    if (interrupt_handlers[r.int_no] != 0) {
+        isr_t handler = interrupt_handlers[r.int_no];
+        handler(r);
+    }
 }
