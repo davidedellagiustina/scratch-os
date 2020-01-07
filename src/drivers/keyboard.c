@@ -11,23 +11,23 @@
 static char buff[256];
 
 const char *sc_name[] = { "Error", "Esc", "1", "2", "3", "4", "5", "6",
-    "7", "8", "9", "0", "'", "ì", "Backspace", "Tab", "q", "w", "e", "r",
-    "t", "y", "u", "i", "o", "p", "è", "+", "Enter", "LCtrl", "a", "s",
-    "d", "f", "g", "h", "j", "k", "l", "ò", "à", "\\", "LShift", "ù", "z",
-    "x", "c", "v", "b", "n", "m", ",", ".", "-", "RShift", "Keypad *", "LAlt",
+    "7", "8", "9", "0", "-", "+", "Backspace", "Tab", "q", "w", "e", "r",
+    "t", "y", "u", "i", "o", "p", "'", "ì", "Enter", "LCtrl", "a", "s",
+    "d", "f", "g", "h", "j", "k", "l", "è", "à", "ò", "LShift", "\\", "z",
+    "x", "c", "v", "b", "n", "m", ",", ".", "ù", "RShift", "Keypad *", "LAlt",
     "Space" };
 const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', '0', '\'', (char)141, '?', '?', 'q', 'w', 'e', 'r', 't', 'y', 'u',
-    'i', 'o', 'p', (char)138, '+', '?', '?', 'a', 's', 'd', 'f', 'g', 'h', 'j',
-    'k', 'l', (char)148, (char)133, '\\', '?', (char)151, 'z', 'x', 'c', 'v', 'b', 'n', 'm',
-    ',', '.', '-', '?', '?', '?', ' ' };
+    '8', '9', '0', '-', '+', '?', '?', 'q', 'w', 'e', 'r', 't', 'y', 'u',
+    'i', 'o', 'p', '\'', (char)141, '?', '?', 'a', 's', 'd', 'f', 'g', 'h', 'j',
+    'k', 'l', (char)138, (char)133, (char)149, '?', '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm',
+    ',', '.', (char)151, '?', '?', '?', ' ' };
 
 /* Handler for the keyboard interrupts.
  * @param r             CPU state (registers).
  */
 static void keyboard_callback(registers_t r) {
     uint8_t scancode = inb(SCANCODE_PORT);
-    /* DEBUG */ char sc[3]; itoa(scancode, sc); kprint(sc); kprint("\n");
+    // /* DEBUG */ char sc[3]; itoa(scancode, sc); kprint(sc); kprint("\n");
     if (scancode > SC_MAX) return;
     if (scancode == BACKSPACE) {
         backspace(buff);
