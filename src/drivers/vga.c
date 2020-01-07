@@ -53,6 +53,15 @@ void clear_screen() {
     set_cursor_offset(get_offset(0, 0));
 }
 
+/* Print a backspace (i.e. delete last char on the screen).
+ */
+void kprint_backspace() {
+    int offset = get_cursor_offset() - 2;
+    int row = get_offset_row(offset);
+    int col = get_offset_col(offset);
+    if (col >= 2) print_char(0x08, row, col, FG_DEFAULT, BG_DEFAULT);
+}
+
 /* Build attribute basing con foreground and background color.
  * @param fg        Foreground color.
  * @param bg        Background color.
@@ -142,11 +151,15 @@ int print_char(char character, int row, int col, vga_color fg, vga_color bg) {
     int offset = ((row >= 0 && col >= 0)? get_offset(row, col) : get_cursor_offset());
     if (character == '\n') {
         offset = get_offset(get_offset_row(offset), MAX_COLS-1);
+        offset += 2;
+    } else if (character == 0x08) { // Backspace
+        vidmem[offset] = ' ';
+        vidmem[offset+1] = attribute;
     } else {
         vidmem[offset] = character;
         vidmem[offset+1] = attribute;
+        offset += 2;
     }
-    offset += 2;
     offset = handle_scrolling(offset);
     set_cursor_offset(offset);
     return offset;

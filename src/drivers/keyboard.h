@@ -8,12 +8,13 @@
 #include "../cpu/isr.h"
 #include "../cpu/ports.h"
 #include "../cpu/types.h"
+#include "../kernel/kernel.h"
 #include "../libc/function.h"
 #include "../libc/string.h"
 #include "vga.h"
 
-#define SCANCODE_PORT 0x60
-#define KEYUP_EVENT_OFFSET 0x80
+#define SCANCODE_PORT       0x60
+#define KEYUP_EVENT_OFFSET  0x80
 
 /* Initialize keryboard listener.
  */

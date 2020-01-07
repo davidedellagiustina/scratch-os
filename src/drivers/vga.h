@@ -56,4 +56,8 @@ void kprint(char *msg);
  */
 void clear_screen();
 
+/* Print a backspace (i.e. delete last char on the screen).
+ */
+void kprint_backspace();
+
 #endif
