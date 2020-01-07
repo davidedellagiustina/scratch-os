@@ -11,11 +11,7 @@ uint32_t tick = 0;
  */
 static void timer_callback(registers_t r) {
     ++tick;
-    kprint("Tick ");
-    char tick_ascii[256];
-    int_to_ascii(tick, tick_ascii);
-    kprint(tick_ascii);
-    kprint("\n");
+    UNUSED(r);
 }
 
 /* Initialize the CPU timer.

@@ -5,8 +5,9 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "../kernel/utils.h"
 #include "../drivers/vga.h"
+#include "../libc/function.h"
+#include "../libc/string.h"
 #include "isr.h"
 
 /* Initialize the CPU timer.

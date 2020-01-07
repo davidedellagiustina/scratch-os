@@ -5,10 +5,12 @@ src/boot/*.bin
 
 src/cpu/*.o
 
+src/drivers/*.o
+
 src/kernel/*.o
 src/kernel/*.bin
 
-src/drivers/*.o
+src/libc/*.o
 
 out/os-image.bin
 out/floppy.img

@@ -12,13 +12,14 @@ void print_letter(uint8_t scancode);
  */
 static void keyboard_callback(registers_t r) {
     uint8_t scancode = inb(SCANCODE_PORT);
-    char *sc_ascii;
-    int_to_ascii(scancode, sc_ascii);
+    char sc_ascii[256];
+    itoa(scancode, sc_ascii);
     kprint("Keyboard scancode: ");
     kprint(sc_ascii);
     kprint(", ");
     print_letter(scancode);
     kprint("\n");
+    UNUSED(r);
 }
 
 /* Initialize keryboard listener.

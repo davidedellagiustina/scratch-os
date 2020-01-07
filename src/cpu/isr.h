@@ -5,11 +5,13 @@
 #ifndef ISR_H
 #define ISR_H
 
-#include "types.h"
-#include "idt.h"
-#include "../kernel/utils.h"
-#include "../kernel/ports.h"
+#include "../drivers/keyboard.h"
 #include "../drivers/vga.h"
+#include "../libc/string.h"
+#include "idt.h"
+#include "ports.h"
+#include "timer.h"
+#include "types.h"
 
 // PIC ports
 #define PIC_MASTER 0x20
@@ -109,6 +111,10 @@ void isr_install();
  * @param r             Registers.
  */
 void isr_handler(registers_t r);
+
+/* Install all the IRQs.
+ */
+void irq_install();
 
 typedef void (*isr_t)(registers_t); // 'isr_t' is a void function with a registers_t parameter
 

@@ -3,8 +3,8 @@
 # @date		14/11/2019
 
 
-C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c)
-C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h)
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c)
+C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h src/libc/*.h)
 OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
 
 KERNEL_SIZE = $$(wc -c < 'src/kernel/kernel.bin') # Compute kernel size (in bytes)
@@ -13,7 +13,7 @@ KERNEL_SECTORS_SIZE = $$((($(KERNEL_SIZE)+511)/512)) # Compute kernel size (in s
 SH = bash
 SFLAGS = -i
 CC = i386-elf-gcc
-CFLAGS = -g
+CFLAGS = -g -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror
 LD = i386-elf-ld
 
 .PHONY: all
@@ -47,5 +47,5 @@ vbox: all
 	$(SH) $(SFLAGS) -c "dd if=out/os-image.bin of=out/floppy.img conv=notrunc"
 
 clean:
-	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o src/cpu/*.o
+	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o src/cpu/*.o src/libc/*.o
 	rm -rf out/os-image.bin out/floppy.img

@@ -25,10 +25,10 @@ void remap_pic(uint32_t offset_master, uint32_t offset_slave) {
     outb(PIC_MASTER_DATA, 0x01); // 8086/88 mode
     outb(PIC_SLAVE_DATA, 0x01);
     // Restore masks
-    // outb(PIC_MASTER_DATA, mask_master);
-    // outb(PIC_SLAVE_DATA, mask_slave);
-    outb(PIC_MASTER_DATA, 0x00);
-    outb(PIC_SLAVE_DATA, 0x00);
+    outb(PIC_MASTER_DATA, mask_master);
+    outb(PIC_SLAVE_DATA, mask_slave);
+    // outb(PIC_MASTER_DATA, 0x00);
+    // outb(PIC_SLAVE_DATA, 0x00);
 }
 
 /* Setup IDT gate for every interrupt, then load IDT descriptor.
@@ -135,14 +135,14 @@ char *exception_messages[] = {
 void isr_handler(registers_t r) {
     kprint("Interrupt ");
     char s[3];
-    int_to_ascii(r.int_no, s);
+    itoa(r.int_no, s);
     kprint(s);
     kprint(": ");
     kprint(exception_messages[r.int_no]);
     kprint("\n");
 }
 
-/* Register an IRQ handler
+/* Register an IRQ handler.
  * @param n                     Interrupt number.
  * @param handler               Handler function.
  */
@@ -157,4 +157,12 @@ void irq_handler(registers_t r) {
         isr_t handler = interrupt_handlers[r.int_no];
         handler(r);
     }
+}
+
+/* Install all the IRQs.
+ */
+void irq_install() {
+    asm volatile("sti");
+    init_timer(50); // IRQ0
+    init_keyboard(); // IRQ1
 }

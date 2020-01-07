@@ -6,7 +6,6 @@
 #define IDT_H
 
 #include "types.h"
-#include "../kernel/utils.h"
 
 #define KERNEL_CS 0x08 // Kernel code segment, defined in the first GDT entry (note: the 0x00 entry in GDT is null, so the very first is located at 0x08)
 #define IDT_ENTRIES 256 // Must be 256, otherwise the CPU panics
@@ -40,7 +39,7 @@ idt_register_t idt_reg;
  * @param n         Index inside the IDT (i.e. interrupt number).
  * @param handler   Address of the handler function for this interrupt.
  */
-void set_idt_gate(uint32_t n, uint32_t handler);
+void set_idt_gate(int n, uint32_t handler);
 
 /* Load the IDT in memory.
  */

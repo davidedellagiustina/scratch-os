@@ -2,12 +2,12 @@
 // @author   Davide Della Giustina
 // @date     07/12/2019
 
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef VGA_H
+#define VGA_H
 
+#include "../cpu/ports.h"
 #include "../cpu/types.h"
-#include "../kernel/utils.h"
-#include "../kernel/ports.h"
+#include "../libc/mem.h"
 
 static const int VIDEO_ADDRESS = 0xb8000;
 
@@ -45,7 +45,7 @@ typedef enum vga_color {
  * @param row       Cursor row index.
  * @param col       Cursor column index.
  */
-void kprint_at(char *msg, int32_t row, int32_t col);
+void kprint_at(char *msg, int row, int col);
 
 /* Print a string at the current cursor position.
  * @param msg       String to print.
