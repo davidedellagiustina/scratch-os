@@ -2,6 +2,38 @@
 ; @author   Davide Della Giustina
 ; @date     31/12/2019
 
+; VERY USEFUL MACROS
+
+; For ISRs that do not push an error code onto the stack.
+; @param 1          ISR number.
+%macro ISR_NOERR 1
+    global isr%1
+    isr%1:
+        push byte 0 ; err_code
+        push byte %1 ; err_no
+        jmp isr_common_stub
+%endmacro
+
+; For ISRs that do push an error code onto the stack.
+; @param 1          ISR number.
+%macro ISR_ERR 1
+    global isr%1
+    isr%1:
+        push byte %1
+        jmp isr_common_stub
+%endmacro
+
+; For IRQs.
+; @param 1          IRQ number.
+; @param 2          Number the IRQ is remapped to.
+%macro IRQ 2
+    global irq%1
+    irq%1:
+        push byte %1
+        push byte %2
+        jmp irq_common_stub
+%endmacro
+
 [bits 32]
 [extern isr_handler] ; Defined in isr.c
 [extern irq_handler] ; Defined in isr.c
@@ -40,7 +72,7 @@ irq_common_stub:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    push esp
+    push esp ; Pass by reference
     ; 2) Call generic C handler function
     call irq_handler
     ; 3) Restore state
@@ -55,320 +87,53 @@ irq_common_stub:
     iret ; Pops cs, eip, eflags, ss, esp, then returns from interrupt
 
 ; ISRs
-global isr0
-global isr1
-global isr2
-global isr3
-global isr4
-global isr5
-global isr6
-global isr7
-global isr8
-global isr9
-global isr10
-global isr11
-global isr12
-global isr13
-global isr14
-global isr15
-global isr16
-global isr17
-global isr18
-global isr19
-global isr20
-global isr21
-global isr22
-global isr23
-global isr24
-global isr25
-global isr26
-global isr27
-global isr28
-global isr29
-global isr30
-global isr31
+ISR_NOERR 0 ; Division By Zero Exception
+ISR_NOERR 1 ; Debug Exception
+ISR_NOERR 2 ; Non Maskable Interrupt Exception
+ISR_NOERR 3 ; Breakpoint Exception
+ISR_NOERR 4 ; Into Detected Overflow Exception
+ISR_NOERR 5 ; Out Of Bounds Exception
+ISR_NOERR 6 ; Invalid Opcode Exception
+ISR_NOERR 7 ; No Coprocessor Exception
+ISR_ERR 8 ; Double Fault Exception (with error code)
+ISR_NOERR 9 ; Coprocessor Segment Overrun Exception
+ISR_ERR 10 ; Bas TSS Exception (with error code)
+ISR_ERR 11 ; Segment Not Present Exception (with error code)
+ISR_ERR 12 ; Stack Fault Exception (with error code)
+ISR_ERR 13 ; General Protection Fault Exception (with error code)
+ISR_ERR 14 ; Page Fault Exception (with error code)
+ISR_NOERR 15 ; Unknown Interrupt Exception
+ISR_NOERR 16 ; Coprocessor Fault Exception
+ISR_NOERR 17 ; Alignment Check Exception
+ISR_NOERR 18 ; Machine Check Exception
+ISR_NOERR 19 ; Reserved Exception
+ISR_NOERR 20 ; Reserved Exception
+ISR_NOERR 21 ; Reserved Exception
+ISR_NOERR 22 ; Reserved Exception
+ISR_NOERR 23 ; Reserved Exception
+ISR_NOERR 24 ; Reserved Exception
+ISR_NOERR 25 ; Reserved Exception
+ISR_NOERR 26 ; Reserved Exception
+ISR_NOERR 27 ; Reserved Exception
+ISR_NOERR 28 ; Reserved Exception
+ISR_NOERR 29 ; Reserved Exception
+ISR_NOERR 30 ; Reserved Exception
+ISR_NOERR 31 ; Reserved Exception
+
 ; IRQs
-global irq0
-global irq1
-global irq2
-global irq3
-global irq4
-global irq5
-global irq6
-global irq7
-global irq8
-global irq9
-global irq10
-global irq11
-global irq12
-global irq13
-global irq14
-global irq15
-
-; ISR 0: Divide By Zero Exception
-isr0:
-    push byte 0 ; Err code
-    push byte 0 ; Err no
-    jmp isr_common_stub
-
-; ISR 1: Debug Exception
-isr1:
-    push byte 0
-    push byte 1
-    jmp isr_common_stub
-
-; ISR 2: Non Maskable Interrupt Exception
-isr2:
-    push byte 0
-    push byte 2
-    jmp isr_common_stub
-
-; ISR 3: Breakpoint Exception
-isr3:
-    push byte 0
-    push byte 3
-    jmp isr_common_stub
-
-; ISR 4: Into Detected Overflow Exception
-isr4:
-    push byte 0
-    push byte 4
-    jmp isr_common_stub
-
-; ISR 5: Out Of Bounds Exception
-isr5:
-    push byte 0
-    push byte 5
-    jmp isr_common_stub
-
-; ISR 6: Invalid Opcode Exception
-isr6:
-    push byte 0
-    push byte 6
-    jmp isr_common_stub
-
-; ISR 7: No Coprocessor Exception
-isr7:
-    push byte 0
-    push byte 7
-    jmp isr_common_stub
-
-; ISR 8: Double Fault Exception (with error code)
-isr8:
-    push byte 8
-    jmp isr_common_stub
-
-; ISR 9: Coprocessor Segment Overrun Exception
-isr9:
-    push byte 0
-    push byte 9
-    jmp isr_common_stub
-
-; ISR 10: Bas TSS Exception (with error code)
-isr10:
-    push byte 10
-    jmp isr_common_stub
-
-; ISR 11: Segment Not Present Exception (with error code)
-isr11:
-    push byte 11
-    jmp isr_common_stub
-
-; ISR 12: Stack Fault Exception (with error code)
-isr12:
-    push byte 12
-    jmp isr_common_stub
-
-; ISR 13: General Protection Fault Exception (with error code)
-isr13:
-    push byte 13
-    jmp isr_common_stub
-
-; ISR 14: Page Fault Exception (with error code)
-isr14:
-    push byte 14
-    jmp isr_common_stub
-
-; ISR 15: Unknown Interrupt Exception
-isr15:
-    push byte 0
-    push byte 15
-    jmp isr_common_stub
-
-; ISR 16: Coprocessor Fault Exception
-isr16:
-    push byte 0
-    push byte 16
-    jmp isr_common_stub
-
-; ISR 17: Alignment Check Exception
-isr17:
-    push byte 0
-    push byte 17
-    jmp isr_common_stub
-
-; ISR 18: Machine Check Exception
-isr18:
-    push byte 0
-    push byte 18
-    jmp isr_common_stub
-
-; ISR 19: Reserved Exception
-isr19:
-    push byte 0
-    push byte 19
-    jmp isr_common_stub
-
-; ISR 20: Reserved Exception
-isr20:
-    push byte 0
-    push byte 20
-    jmp isr_common_stub
-
-; ISR 21: Reserved Exception
-isr21:
-    push byte 0
-    push byte 21
-    jmp isr_common_stub
-
-; ISR 22: Reserved Exception
-isr22:
-    push byte 0
-    push byte 22
-    jmp isr_common_stub
-
-; ISR 23: Reserved Exception
-isr23:
-    push byte 0
-    push byte 23
-    jmp isr_common_stub
-
-; ISR 24: Reserved Exception
-isr24:
-    push byte 0
-    push byte 24
-    jmp isr_common_stub
-
-; ISR 25: Reserved Exception
-isr25:
-    push byte 0
-    push byte 25
-    jmp isr_common_stub
-
-; ISR 26: Reserved Exception
-isr26:
-    push byte 0
-    push byte 26
-    jmp isr_common_stub
-
-; ISR 27: Reserved Exception
-isr27:
-    push byte 0
-    push byte 27
-    jmp isr_common_stub
-
-; ISR 28: Reserved Exception
-isr28:
-    push byte 0
-    push byte 28
-    jmp isr_common_stub
-
-; ISR 29: Reserved Exception
-isr29:
-    push byte 0
-    push byte 29
-    jmp isr_common_stub
-
-; ISR 30: Reserved Exception
-isr30:
-    push byte 0
-    push byte 30
-    jmp isr_common_stub
-
-; ISR 31: Reserved Exception
-isr31:
-    push byte 0
-    push byte 31
-    jmp isr_common_stub
-
-; IRQ handlers
-
-irq0:
-    push byte 0
-    push byte 32
-    jmp irq_common_stub
-
-irq1:
-    push byte 1
-    push byte 33
-    jmp irq_common_stub
-
-irq2:
-    push byte 2
-    push byte 34
-    jmp irq_common_stub
-
-irq3:
-    push byte 3
-    push byte 35
-    jmp irq_common_stub
-
-irq4:
-    push byte 4
-    push byte 36
-    jmp irq_common_stub
-
-irq5:
-    push byte 5
-    push byte 37
-    jmp irq_common_stub
-
-irq6:
-    push byte 6
-    push byte 38
-    jmp irq_common_stub
-
-irq7:
-    push byte 7
-    push byte 39
-    jmp irq_common_stub
-
-irq8:
-    push byte 8
-    push byte 40
-    jmp irq_common_stub
-
-irq9:
-    push byte 9
-    push byte 41
-    jmp irq_common_stub
-
-irq10:
-    push byte 10
-    push byte 42
-    jmp irq_common_stub
-
-irq11:
-    push byte 11
-    push byte 43
-    jmp irq_common_stub
-
-irq12:
-    push byte 12
-    push byte 44
-    jmp irq_common_stub
-
-irq13:
-    push byte 13
-    push byte 45
-    jmp irq_common_stub
-
-irq14:
-    push byte 14
-    push byte 46
-    jmp irq_common_stub
-
-irq15:
-    push byte 15
-    push byte 47
-    jmp irq_common_stub
+IRQ 0, 32
+IRQ 1, 33
+IRQ 2, 34
+IRQ 3, 35
+IRQ 4, 36
+IRQ 5, 37
+IRQ 6, 38
+IRQ 7, 39
+IRQ 8, 40
+IRQ 9, 41
+IRQ 10, 42
+IRQ 11, 43
+IRQ 12, 44
+IRQ 13, 45
+IRQ 14, 46
+IRQ 15, 47
