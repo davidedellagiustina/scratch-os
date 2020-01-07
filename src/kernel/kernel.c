@@ -18,13 +18,24 @@ void kmain() {
 }
 
 /* Parse basic shell commands.
- * @param input         Input command.
+ * @param cmd           Input command.
  */
-void parse_input(char *input) {
-    if (strcmp(input, "exit") == 0 || strcmp(input, "quit") == 0) {
-        kprint("Halting the CPU...\n");
+void parse_input(char *cmd) {
+    if (strcmp(cmd, "exit") == 0 || strcmp(cmd, "quit") == 0) {
+        kprint("Halting the CPU...");
         asm volatile("hlt");
+    } else if (strcmp(cmd, "mkpage") == 0) {
+        uint32_t page, physical;
+        page = kmalloc(1000, 1, &physical);
+        char page_str[16] = "", physical_str[16] = "";
+        itoa(page, page_str);
+        itoa(physical, physical_str);
+        kprint("Page: ");
+        kprint(page_str);
+        kprint(", physical address: ");
+        kprint(physical_str);
     } else {
-        kprint("Unrecognised command\n> ");
+        kprint("Unrecognised command");
     }
+    kprint("\n> ");
 }

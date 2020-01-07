@@ -6,8 +6,8 @@
 #define KERNEL_H
 
 /* Parse basic shell commands.
- * @param input         Input command.
+ * @param cmd           Input command.
  */
-void parse_input(char *input);
+void parse_input(char *cmd);
 
 #endif
