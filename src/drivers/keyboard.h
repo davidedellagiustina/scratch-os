@@ -5,9 +5,9 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include <stdint.h>
 #include "../cpu/isr.h"
 #include "../cpu/ports.h"
-#include "../cpu/types.h"
 #include "../kernel/kernel.h"
 #include "../libc/function.h"
 #include "../libc/string.h"

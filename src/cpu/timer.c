@@ -9,7 +9,7 @@ uint32_t tick = 0;
 /* Handler for the timer interrupts.
  * @param r             CPU state (registers).
  */
-static void timer_callback(registers_t r) {
+static void timer_callback(registers_t *r) {
     ++tick;
     UNUSED(r);
 }

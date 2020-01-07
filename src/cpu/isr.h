@@ -5,13 +5,13 @@
 #ifndef ISR_H
 #define ISR_H
 
+#include <stdint.h>
 #include "../drivers/keyboard.h"
 #include "../drivers/vga.h"
 #include "../libc/string.h"
 #include "idt.h"
 #include "ports.h"
 #include "timer.h"
-#include "types.h"
 
 // PIC ports
 #define PIC_MASTER 0x20
@@ -92,9 +92,9 @@ extern void irq15();
 // Registers structure
 typedef struct {
     uint32_t ds; // Data segment selector
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha
+    uint32_t edi, esi, ebp, useless, ebx, edx, ecx, eax; // Pushed by pusha
     uint32_t int_no, err_code; // Interrupt number and error code, if applicable
-    uint32_t eip, cs, eflags, useresp, ss; // Automatically pushed by the CPU
+    uint32_t eip, cs, eflags, esp, ss; // Automatically pushed by the CPU
 } registers_t;
 
 /* Remap the PICs to the desired offsets.
@@ -110,13 +110,13 @@ void isr_install();
 /* Generic ISR handler function.
  * @param r             Registers.
  */
-void isr_handler(registers_t r);
+void isr_handler(registers_t *r);
 
 /* Install all the IRQs.
  */
 void irq_install();
 
-typedef void (*isr_t)(registers_t); // 'isr_t' is a void function with a registers_t parameter
+typedef void (*isr_t)(registers_t *); // 'isr_t' is a void function with a registers_t * parameter
 
 /* Register an IRQ handler
  * @param n                     Interrupt number.

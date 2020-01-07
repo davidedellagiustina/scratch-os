@@ -5,7 +5,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include "types.h"
+#include <stdint.h>
 
 #define KERNEL_CS 0x08 // Kernel code segment, defined in the first GDT entry (note: the 0x00 entry in GDT is null, so the very first is located at 0x08)
 #define IDT_ENTRIES 256 // Must be 256, otherwise the CPU panics

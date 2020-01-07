@@ -5,7 +5,7 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-#include "../cpu/types.h"
+#include <stdint.h>
 
 /* Convert an integer value to an ASCII string.
  * @param n             Integer value.

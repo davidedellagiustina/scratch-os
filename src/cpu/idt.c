@@ -9,11 +9,11 @@
  * @param handler   Address of the handler function for this interrupt.
  */
 void set_idt_gate(int n, uint32_t handler) {
-    idt[n].low_offset = low_16(handler);
+    idt[n].low_offset = (uint16_t)(handler & 0xffff);
     idt[n].sel = KERNEL_CS;
     idt[n].zero = 0;
     idt[n].flags = 0x8e; // 10001110b => interrupt present, kernel privileges, interrupt gate set, 32 bit gate
-    idt[n].high_offset = high_16(handler);
+    idt[n].high_offset = (uint16_t)((handler >> 16) & 0xffff);
 }
 
 /* Load the IDT in memory.

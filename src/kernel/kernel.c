@@ -2,9 +2,7 @@
 // @author   Davide Della Giustina
 // @date     07/12/2019
 
-#include "../cpu/isr.h"
-#include "../drivers/vga.h"
-#include "../libc/string.h"
+#include "kernel.h"
 
 /* Kernel main.
  */

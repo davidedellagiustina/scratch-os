@@ -25,7 +25,7 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6', '7', '8',
 /* Handler for the keyboard interrupts.
  * @param r             CPU state (registers).
  */
-static void keyboard_callback(registers_t r) {
+static void keyboard_callback(registers_t *r) {
     uint8_t scancode = inb(SCANCODE_PORT);
     // /* DEBUG */ char sc[3]; itoa(scancode, sc); kprint(sc); kprint("\n");
     if (scancode > SC_MAX) return;

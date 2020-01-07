@@ -5,8 +5,8 @@
 #ifndef VGA_H
 #define VGA_H
 
+#include <stdint.h>
 #include "../cpu/ports.h"
-#include "../cpu/types.h"
 #include "../libc/mem.h"
 
 static const int VIDEO_ADDRESS = 0xb8000;
