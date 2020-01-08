@@ -9,7 +9,7 @@
 void kmain() {
     // Install interrupt handlers
     isr_install();
-    irq_install();
+    irq_init();
     // Some basic tests
     clear_screen();
     kprint("Hello world!\n> ");
@@ -26,8 +26,8 @@ void parse_input(char *cmd) {
         uint32_t page, physical;
         page = kmalloc(1000, 1, &physical);
         char page_str[16] = "", physical_str[16] = "";
-        itoa(page, page_str);
-        itoa(physical, physical_str);
+        itoa(page, page_str, 16);
+        itoa(physical, physical_str, 16);
         kprint("Page: ");
         kprint(page_str);
         kprint(", physical address: ");

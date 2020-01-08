@@ -1,4 +1,4 @@
-; @desc     Kernel entry: kall kmain label
+; @desc     Kernel entry: kall kmain()
 ; @author   Davide Della Giustina
 ; @date     07/12/2019
 
@@ -6,4 +6,4 @@
 [extern kmain]
 
 call kmain
-jmp $
+jmp $ ; Control should never get back there, just for prevention

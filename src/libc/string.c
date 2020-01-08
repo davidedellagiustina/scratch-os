@@ -7,14 +7,20 @@
 /* Convert an integer value to an ASCII string.
  * @param n             Integer value.
  * @param str           String to put the value to.
+ * @param base          Base the integer value should be interpreted in.
  */
-void itoa(int n, char str[]) {
+void itoa(int n, char str[], int base) {
+    if (base < 2 || base > 16) {
+        str[0] = '\0';
+        return;
+    }
+    char alph[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }; // Alphabet
     int i, sign;
     if ((sign = n) < 0) n = -n;
     i = 0;
     do {
-        str[i++] = n % 10 + '0';
-    } while ((n /= 10) > 0);
+        str[i++] = alph[n % base];
+    } while ((n /= base) > 0);
     if (sign < 0) str[i++] = '-';
     str[i] = '\0';
     reverse(str);

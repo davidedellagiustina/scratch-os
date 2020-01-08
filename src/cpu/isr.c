@@ -27,8 +27,6 @@ void remap_pic(uint32_t offset_master, uint32_t offset_slave) {
     // Restore masks
     outb(PIC_MASTER_DATA, mask_master);
     outb(PIC_SLAVE_DATA, mask_slave);
-    // outb(PIC_MASTER_DATA, 0x00);
-    // outb(PIC_SLAVE_DATA, 0x00);
 }
 
 /* Setup IDT gate for every interrupt, then load IDT descriptor.
@@ -87,7 +85,7 @@ void isr_install() {
     set_idt_gate(46, (uint32_t)irq14);
     set_idt_gate(47, (uint32_t)irq15);
     // Load IDT in memory
-    set_idt();
+    load_idt();
 }
 
 // Excptions messages
@@ -133,12 +131,12 @@ char *exception_messages[] = {
  * @param r             Registers.
  */
 void isr_handler(registers_t *r) {
-    kprint("Interrupt ");
-    char s[3];
-    itoa(r->int_no, s);
-    kprint(s);
-    kprint(": ");
+    kprint("Unhandled exception: ");
     kprint(exception_messages[r->int_no]);
+    kprint(", code ");
+    char s[3];
+    itoa(r->int_no, s, 10);
+    kprint(s);
     kprint("\n");
 }
 
@@ -150,8 +148,11 @@ void register_interrupt_handler(uint8_t n, isr_t handler) {
     interrupt_handlers[n] = handler;
 }
 
+/* Generic handler for IRQs
+ * @param r                     Registers.
+ */
 void irq_handler(registers_t *r) {
-    if (r->int_no >= 40) outb(PIC_SLAVE_COMMAND, 0x20); // EOI (End Of Interrupt)
+    if (r->int_no >= 40) outb(PIC_SLAVE_COMMAND, 0x20); // Send EOI (End Of Interrupt) in order to receive future interrupts
     outb(PIC_MASTER_COMMAND, 0x20);
     if (interrupt_handlers[r->int_no] != 0) {
         isr_t handler = interrupt_handlers[r->int_no];
@@ -159,10 +160,10 @@ void irq_handler(registers_t *r) {
     }
 }
 
-/* Install all the IRQs.
+/* Setup all the implemented IRQs.
  */
-void irq_install() {
-    asm volatile("sti");
+void irq_init() {
+    asm volatile("sti"); // Enable interrupts (disabled when switching to 32-bit protected mode)
     init_timer(50); // IRQ0
     init_keyboard(); // IRQ1
 }

@@ -10,8 +10,9 @@
 /* Convert an integer value to an ASCII string.
  * @param n             Integer value.
  * @param str           String to put the value to.
+ * @param base          Base the integer value should be interpreted in.
  */
-void itoa(int n, char str[]);
+void itoa(int n, char str[], int base);
 
 /* Reverse a string.
  * @param str           String to reverse.
