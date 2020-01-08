@@ -24,7 +24,7 @@ char *itoa(int n, char *str, int base) {
     } while ((n /= base) > 0);
     if (sign < 0) str[i++] = '-';
     str[i] = '\0';
-    reverse(str);
+    str_reverse(str);
     return str;
 }
 
@@ -51,32 +51,44 @@ int strcmp(const char *str1, const char *str2) {
     return (str1[i] - str2[i]);
 }
 
+/* Concat first #n characters of #src at the end of #dst.
+ * @param src           String to be appended.
+ * @param dst           String to append to.
+ * @param n             Number of characters to append.
+ * @return              Pointer to #dst.
+ */
+char *strncat(char *dst, const char *src, int n) {
+    char *ptr = dst + strlen(dst);
+    while (*src != '\0' && n--)
+        *ptr++ = *src++;
+    *ptr = '\0';
+    return dst;
+}
+
 /* Reverse a string.
  * @param str           String to reverse.
+ * @return              Pointer to #str.
  */
-void reverse(char *str) {
+char *str_reverse(char *str) {
     int c, i, j;
     for (i = 0, j = strlen(str)-1; i < j; ++i, --j) {
         c = str[i];
         str[i] = str[j];
         str[j] = c;
     }
+    return str;
 }
 
-/* Delete the last character of a string.
+/* Delete the last #n characters of a string.
  * @param str           String.
+ * @param n             Number of characters to truncate.
+ * @return              Pointer to #str.
  */
-void backspace(char *str) {
+char *str_truncate(char *str, int n) {
+    if (n <= 0) return str;
+    int l = n;
     int len = strlen(str);
-    str[len-1] = '\0';
-}
-
-/* Append a character at the end of a string.
- * @param str           String.
- * @param c             Character.
- */
-void append(char *str, char c) {
-    int len = strlen(str);
-    str[len] = c;
-    str[len+1] = '\0';
+    if (n > len) l = len;
+    str[len-l] = '\0';
+    return str;
 }

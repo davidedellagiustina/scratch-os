@@ -57,20 +57,32 @@ char *strcpy(const char *src, char * dst); // TODO
  */
 char *strncpy(const char *src, char *dst, int n); // TODO
 
+/* Concat #src at the end of #dst.
+ * @param src           String to be appended.
+ * @param dst           String to append to.
+ * @return              Pointer to @dst.
+ */
+char *strcat(char *dst, const char *src); // TODO
+
+/* Concat first #n characters of #src at the end of #dst.
+ * @param src           String to be appended.
+ * @param dst           String to append to.
+ * @param n             Number of characters to append.
+ * @return              Pointer to #dst.
+ */
+char *strncat(char *dst, const char *src, int n);
+
 /* Reverse a string.
  * @param str           String to reverse.
+ * @return              Pointer to #str.
  */
-void reverse(char *str);
+char *str_reverse(char *str);
 
-/* Delete the last character of a string.
+/* Delete the last #n characters of a string.
  * @param str           String.
+ * @param n             Number of characters to truncate.
+ * @return              Pointer to #str.
  */
-void backspace(char *str);
-
-/* Append a character at the end of a string.
- * @param str           String.
- * @param c             Character.
- */
-void append(char *str, char c);
+char *str_truncate(char *str, int n);
 
 #endif

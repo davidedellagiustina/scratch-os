@@ -58,6 +58,6 @@ void clear_screen();
 
 /* Print a backspace (i.e. delete last char on the screen).
  */
-void kprint_backspace();
+void clear_last_char();
 
 #endif

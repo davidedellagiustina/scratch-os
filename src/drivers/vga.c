@@ -55,7 +55,7 @@ void clear_screen() {
 
 /* Print a backspace (i.e. delete last char on the screen).
  */
-void kprint_backspace() {
+void clear_last_char() {
     int offset = get_cursor_offset() - 2;
     int row = get_offset_row(offset);
     int col = get_offset_col(offset);
@@ -155,6 +155,7 @@ int print_char(char character, int row, int col, vga_color fg, vga_color bg) {
     } else if (character == 0x08) { // Backspace
         vidmem[offset] = ' ';
         vidmem[offset+1] = attribute;
+        // Do not increment cursor position
     } else {
         vidmem[offset] = character;
         vidmem[offset+1] = attribute;

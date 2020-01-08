@@ -10,6 +10,7 @@
 
 static char buff[256];
 
+const char layout[] = "italian";
 const char *sc_name[] = { "Error", "Esc", "1", "2", "3", "4", "5", "6",
     "7", "8", "9", "0", "-", "+", "Backspace", "Tab", "q", "w", "e", "r",
     "t", "y", "u", "i", "o", "p", "'", "ì", "Enter", "LCtrl", "a", "s",
@@ -27,19 +28,18 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6', '7', '8',
  */
 static void keyboard_callback(registers_t *r) {
     uint8_t scancode = inb(SCANCODE_PORT);
-    // /* DEBUG */ char sc[3]; itoa(scancode, sc); kprint(sc); kprint("\n");
     if (scancode > SC_MAX) return;
     if (scancode == BACKSPACE) {
-        backspace(buff);
-        kprint_backspace();
+        str_truncate(buff, 1);
+        clear_last_char();
     } else if (scancode == ENTER) {
         kprint("\n");
         parse_input(buff);
         buff[0] = '\0';
     } else {
         char c = sc_ascii[(int)scancode];
-        char str[2] = {c, '\0'};
-        append(buff, c);
+        char str[2] = { c, '\0' };
+        strncat(buff, &c, 1);
         kprint(str);
     }
     (void)(r); // Unused parameter
