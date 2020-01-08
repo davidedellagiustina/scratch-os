@@ -42,7 +42,7 @@ static void keyboard_callback(registers_t *r) {
         append(buff, c);
         kprint(str);
     }
-    UNUSED(r);
+    (void)(r); // Unused parameter
 }
 
 /* Initialize keryboard listener.

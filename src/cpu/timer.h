@@ -7,7 +7,6 @@
 
 #include <stdint.h>
 #include "../drivers/vga.h"
-#include "../libc/function.h"
 #include "../libc/string.h"
 #include "isr.h"
 
