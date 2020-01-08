@@ -6,11 +6,11 @@
 
 gdt_start:
 
-gdt_null:
+gdt_null: ; Mandatory null segment descriptor
     dd 0x0
     dd 0x0
 
-gdt_code:
+gdt_code: ; Kernel-mode code segment dscriptor
     ; Base -> 0x0 | Limit -> 0xfffff
     ; 1st flags: present=1, privilege=00, descriptor-type=1 -> 1001b
     ; Type flags: code=1, conforming=0, readable=1, accessed=0 -> 1010b
@@ -22,7 +22,7 @@ gdt_code:
     db 11001111b ; 2nd flags + limit (16-19)
     db 0x0 ; Base (24-31)
 
-gdt_data:
+gdt_data: ; Kernel-mode data segment descriptor
     ; Base -> 0x0 | Limit -> 0xfffff
     ; 1st flags: present=1, privilege=00, descriptor-type=1 -> 1001b
     ; Type flags: code=0, expand-down=0, writable=1, accessed=0 -> 0010b
@@ -36,7 +36,7 @@ gdt_data:
 
 gdt_end:
 
-gdt_descriptor:
+gdt_descriptor: ; GDT descriptor: base + limit
     dw gdt_end - gdt_start - 1 ; One less than real size of the GDT
     dd gdt_start
 

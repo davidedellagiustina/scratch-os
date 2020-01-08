@@ -1,4 +1,4 @@
-; @desc     Basic boot sector: load kernel from disk, witch to protected mode and transfer control to kernel
+; @desc     Basic one-stage boot sector: load kernel from disk, switch to protected mode and transfer control to kernel
 ; @author   Davide Della Giustina
 ; @date     14/11/2019
 
@@ -10,18 +10,18 @@ KERNEL_OFFSET equ 0x1000
 
 jmp init
 
-%include "src/boot/libs/16bit/print.asm"
-%include "src/boot/libs/16bit/println.asm"
-%include "src/boot/libs/16bit/hexprint.asm"
-%include "src/boot/libs/16bit/loaddisk.asm"
+%include "src/boot/lib/16bit/print.asm"
+%include "src/boot/lib/16bit/println.asm"
+%include "src/boot/lib/16bit/hexprint.asm"
+%include "src/boot/lib/16bit/loaddisk.asm"
 %include "src/boot/gdt.asm"
-%include "src/boot/libs/32bit/print.asm"
+%include "src/boot/lib/32bit/print.asm"
 
-[bits 16]
+[bits 16] ; Real mode code
 
 ; Initialization
 init:
-    mov [BOOT_DRIVE], dl ; Boot drive number is stored by the BIOS
+    mov [BOOT_DRIVE], dl ; Boot drive number is stored by the BIOS, so save it
     mov bp, 0x9000 ; Stack
     mov sp, bp
     mov bx, BOOTING_OS_MSG ; Boot message
@@ -39,14 +39,14 @@ load_kernel:
 
 ; Switch to protected mode
 switch_to_pm:
-    cli
+    cli ; Must stop receiving interrupts, will be re-enabled later
     lgdt [gdt_descriptor]
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
     jmp CODE_SEG:pm_init ; Long jump (i.e. other segment)
 
-[bits 32]
+[bits 32] ; Protected mode code
 
 ; Protected mode initialization
 pm_init:
@@ -68,5 +68,5 @@ main:
 BOOT_DRIVE: db 0
 BOOTING_OS_MSG: db 'Booting OwlOs...', 0
 
-times 510-($-$$) db 0
+times 510-($-$$) db 0 ; Padding to 1 whole sector (512B)
 dw 0xaa55 ; Magic number
