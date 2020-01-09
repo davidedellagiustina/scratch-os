@@ -12,9 +12,6 @@
 #include "../libc/string.h"
 #include "vga.h"
 
-#define SCANCODE_PORT       0x60
-#define KEYUP_EVENT_OFFSET  0x80
-
 /* Initialize keryboard listener.
  */
 void init_keyboard();
