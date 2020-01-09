@@ -43,8 +43,10 @@ static void keyboard_callback(registers_t *r) {
     else if (scancode > SC_MAX) return;
     // Backspace
     else if (scancode == BACKSPACE) {
-        str_truncate(buff, 1);
-        clear_last_char();
+        if (strlen(buff) > 0) {
+            str_truncate(buff, 1);
+            clear_last_char();
+        }
     // Enter
     } else if (scancode == ENTER) {
         kprint("\n");

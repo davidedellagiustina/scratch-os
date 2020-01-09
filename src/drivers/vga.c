@@ -59,7 +59,7 @@ void clear_last_char() {
     int offset = get_cursor_offset() - 2;
     int row = get_offset_row(offset);
     int col = get_offset_col(offset);
-    if (col >= 2) print_char(0x08, row, col, FG_DEFAULT, BG_DEFAULT);
+    print_char(0x08, row, col, FG_DEFAULT, BG_DEFAULT);
 }
 
 /* Build attribute basing con foreground and background color.
