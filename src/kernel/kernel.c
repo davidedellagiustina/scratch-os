@@ -12,7 +12,7 @@ void kmain() {
     irq_init();
     // Some basic tests
     clear_screen();
-    kprint("Hello world!\n> ");
+    kprint("OwlOS v0.1\n\n> ");
 }
 
 /* Parse basic shell commands.
@@ -28,9 +28,9 @@ void parse_input(char *cmd) {
         char page_str[16] = "", physical_str[16] = "";
         itoa(page, page_str, 16);
         itoa(physical, physical_str, 16);
-        kprint("Page: ");
+        kprint("Page: 0x");
         kprint(page_str);
-        kprint(", physical address: ");
+        kprint(", physical address: 0x");
         kprint(physical_str);
     } else {
         kprint("Unrecognised command");

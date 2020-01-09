@@ -26,20 +26,20 @@ void memset(uint8_t *dst, uint8_t val, size_t len) {
     for (; len != 0; --len) *temp++ = val;
 }
 
-uint32_t free_mem_addr = 0x10000;
+uint32_t sys_brk = 0x10000;
 
 /* Memory allocator.
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
- * @param physical_addr Physical base address of the allocated memory (buffer).
+ * @param physical      Physical base address of the allocated memory (buffer).
  */
-uint32_t kmalloc(size_t size, int align, uint32_t *physical_addr) {
-    if (align == 1 && (free_mem_addr & 0xfffff000)) {
-        free_mem_addr &= 0xfffff000;
-        free_mem_addr += 0x1000; // 4K
+uint32_t kmalloc(size_t size, int align, uint32_t *physical) {
+    if (align == 1 && (sys_brk & 0xfffff000)) {
+        sys_brk &= 0xfffff000;
+        sys_brk += 0x1000; // 4K
     }
-    if (physical_addr) *physical_addr = free_mem_addr;
-    uint32_t ret = free_mem_addr;
-    free_mem_addr += size;
-    return ret;
+    if (physical) *physical = sys_brk;
+    uint32_t r = sys_brk;
+    sys_brk += size;
+    return r;
 }

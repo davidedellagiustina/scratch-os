@@ -25,8 +25,8 @@ void memset(uint8_t *dst, uint8_t val, size_t len);
 /* Memory allocator.
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
- * @param physical_addr Physical base address of the allocated memory (buffer).
+ * @param physical      Physical base address of the allocated memory (buffer).
  */
-uint32_t kmalloc(size_t size, int align, uint32_t *physical_addr);
+uint32_t kmalloc(size_t size, int align, uint32_t *physical);
 
 #endif
