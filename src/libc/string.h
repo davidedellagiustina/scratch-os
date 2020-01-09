@@ -19,7 +19,7 @@ char *itoa(int n, char *str, int base);
  * @param str           String.
  * @return              Integer value.
  */
-int atoi(const char *str); // TODO
+int atoi(const char *str);
 
 /* Compute the length of a string.
  * @param str           String.
@@ -40,14 +40,14 @@ int strcmp(const char *str1, const char *str2);
  * @param n             Position of the last character to compare.
  * @return              Negative => str1< str2, zero => str1 = str2, positive => str1 > str2.
  */
-int strncmp(const char *str1, const char *str2, int n); // TODO
+int strncmp(const char *str1, const char *str2, int n);
 
 /* Copy string #src to #dst.
  * @param src           Source string.
  * @param dst           Destination string.
  * @return              Pointer to #dst.
  */
-char *strcpy(const char *src, char * dst); // TODO
+char *strcpy(const char *src, char * dst);
 
 /* Copy string #src to #dst, but just the first #n characters.
  * @param src           Source string.
@@ -55,14 +55,14 @@ char *strcpy(const char *src, char * dst); // TODO
  * @param n             Number of characters to copy.
  * @return              Pointer to @dst.
  */
-char *strncpy(const char *src, char *dst, int n); // TODO
+char *strncpy(const char *src, char *dst, int n);
 
 /* Concat #src at the end of #dst.
  * @param src           String to be appended.
  * @param dst           String to append to.
  * @return              Pointer to @dst.
  */
-char *strcat(char *dst, const char *src); // TODO
+char *strcat(char *dst, const char *src);
 
 /* Concat first #n characters of #src at the end of #dst.
  * @param src           String to be appended.
