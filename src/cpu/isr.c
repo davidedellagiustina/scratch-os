@@ -131,13 +131,18 @@ char *exception_messages[] = {
  * @param r             Registers.
  */
 void isr_handler(registers_t *r) {
-    kprint("Unhandled exception: ");
-    kprint(exception_messages[r->int_no]);
-    kprint(", code ");
-    char s[3];
-    itoa(r->int_no, s, 10);
-    kprint(s);
-    kprint("\n");
+    if (interrupt_handlers[r->int_no] != 0) { // If there is a handler for the exception
+        isr_t handler = interrupt_handlers[r->int_no];
+        handler(r);
+    } else { // If there is no registered handler
+        kprint("Unhandled exception: ");
+        kprint(exception_messages[r->int_no]);
+        kprint(", code ");
+        char s[3];
+        itoa(r->int_no, s, 10);
+        kprint(s);
+        kprint("\n");
+    }
 }
 
 /* Register an IRQ handler.
