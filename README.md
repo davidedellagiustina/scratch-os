@@ -1,3 +1,9 @@
+# OwlOS
+
+OwlOS is a tiny operating system developed for learning purposes. It is currently under development.
+
+![Main screen](imgs/main.png)
+
 # License
 
 This software is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 License.
