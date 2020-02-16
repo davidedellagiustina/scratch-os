@@ -19,7 +19,7 @@ void memcpy(uint8_t *src, uint8_t *dst, int nbytes) {
 /* Set a certain portion of memory to a value.
  * @param dst           Base memory address.
  * @param val           Value to set.
- * @param len           Length of memory portion.
+ * @param len           Length of memory portion (in bytes).
  */
 void memset(uint8_t *dst, uint8_t val, size_t len) {
     uint8_t *temp = (uint8_t *)dst;

@@ -7,7 +7,7 @@
 /* Convert an integer value to an ASCII string.
  * @param n             Integer value.
  * @param str           String to put the value to.
- * @param base          Base the integer value should be interpreted in.
+ * @param base          Base the integer value should be interpreted in (max 16).
  * @return              Pointer to string (#str).
  */
 char *itoa(int n, char *str, int base) {
@@ -17,12 +17,13 @@ char *itoa(int n, char *str, int base) {
     }
     char alph[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' }; // Alphabet
     int i, sign;
-    if ((sign = n) < 0) n = -n;
+    if (base == 10 && (sign = n) < 0) n = -n; // Signed mode is useful just when working in base 10
+    unsigned int m = (unsigned int)n; // Unsigned copy of n, to make calculations
     i = 0;
     do {
-        str[i++] = alph[n % base];
-    } while ((n /= base) > 0);
-    if (sign < 0) str[i++] = '-';
+        str[i++] = alph[m % base];
+    } while ((m /= base) > 0);
+    if (base == 10 && sign < 0) str[i++] = '-'; // Signed mode is useful just when working in base 10
     str[i] = '\0';
     str_reverse(str);
     return str;
