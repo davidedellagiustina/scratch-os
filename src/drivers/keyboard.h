@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include "../cpu/isr.h"
 #include "../cpu/ports.h"
-#include "../kernel/kernel.h"
+#include "../kernel/shell.h"
 #include "../libc/string.h"
 #include "vga.h"
 

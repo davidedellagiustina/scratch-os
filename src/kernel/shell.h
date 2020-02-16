@@ -1,13 +1,10 @@
-// @desc     Kernel header
-// @author   Davide Della Giustina
-// @date     07/01/2020
+// TEMP FILE JUST TO AVOID CIRCULAR REFERENCES
 
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef SHELL_H
+#define SHELL_H
 
-#include <stdint.h>
-#include "../cpu/isr.h"
 #include "../drivers/vga.h"
+#include "../libc/mem.h"
 #include "../libc/string.h"
 
 /* Parse basic shell commands.
