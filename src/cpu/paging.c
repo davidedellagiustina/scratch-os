@@ -29,12 +29,9 @@ void free_frame(page_t *page);
 void init_paging() {
     uint32_t mem_end_page = 0x1000000; // 16MB of physical memory
     nframes = mem_end_page / 0x1000;
-    //frames = (uint32_t *)kmalloc(INDEX(nframes), 0, 0);
-    frames = (uint32_t *)kmalloc(INDEX(nframes), 0, NULL);
+    frames = (uint32_t *)kmalloc(INDEX(nframes), 0, 0);
     memset((uint8_t *)frames, 0, INDEX(nframes));
-    //uint32_t physical;
-    //kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
-    kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, NULL);
+    kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, 0);
     memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
     current_directory = kernel_directory;
     unsigned int i = 0;
@@ -55,19 +52,6 @@ void load_page_directory(page_directory_t *page_directory) {
     uint32_t cr0;
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000; // Set paging bit
-    //
-    uint32_t dir;
-    for (int i = 0; i < 3; ++i) {
-        asm volatile("mov [%%cr3], %0" : "=r"(cr3));
-    }
-    char tmp[33];
-    itoa(cr3, tmp, 16);
-    kprint("cr3: 0x");
-    kprint(tmp);
-    kprint("\n");
-    asm volatile("hlt");
-    return;
-    //
     asm volatile("mov %0, %%cr0" : : "r"(cr0));
 }
 
