@@ -16,6 +16,8 @@ CC = i386-elf-gcc
 CFLAGS = -g -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror
 LD = i386-elf-ld
 
+RAM_SIZE = 128 # RAM size in MB
+
 .PHONY: all
 .PHONY: run
 .PHONY: vbox
@@ -40,7 +42,7 @@ out/os-image.bin: src/boot/bootsect.bin src/kernel/kernel.bin
 	$(SH) $(SFLAGS) -c "cat $^ > $@"
 
 run: all
-	qemu out/os-image.bin
+	qemu -m $(RAM_SIZE) out/os-image.bin
 
 vbox: all
 	$(SH) $(SFLAGS) -c "dd if=/dev/zero of=out/floppy.img ibs=1k count=1440"
