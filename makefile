@@ -33,7 +33,7 @@ all: out/os-image.bin # Default target
 	$(SH) $(SFLAGS) -c "nasm -felf $< -o $@"
 
 %.o: %.c $(C_HEADERS)
-	$(SH) $(SFLAGS) -c "$(CC) $(CFLAGS) -ffreestanding -c $< -o $@"
+	$(SH) $(SFLAGS) -c "$(CC) $(CFLAGS) -DTOTAL_RAM_SIZE=$(RAM_SIZE) -ffreestanding -c $< -o $@"
 
 src/kernel/kernel.bin: src/kernel/kernel_entry.o $(OBJ)
 	$(SH) $(SFLAGS) -c "$(LD) -e kmain -Ttext 0x1000 $^ -o $@ --oformat binary"

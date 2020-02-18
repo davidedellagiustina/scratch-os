@@ -1,6 +1,6 @@
 // @desc     Paging
 // @author   Davide Della Giustina
-// @date     11/01/2020
+// @date     16/02/2020
 
 #include "paging.h"
 
@@ -27,18 +27,46 @@ void free_frame(page_t *page);
 /* Initialize paging environment.
  */
 void init_paging() {
-    uint32_t mem_end_page = 0x1000000; // 16MB of physical memory
+    // uint32_t mem_end_page = 0x1000000; // 16MB of physical memory
+    uint32_t mem_end_page = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB
     nframes = mem_end_page / 0x1000;
     frames = (uint32_t *)kmalloc(INDEX(nframes), 0, 0);
     memset((uint8_t *)frames, 0, INDEX(nframes));
-    kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, 0);
+    uint32_t physical;
+    kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
+    kernel_directory->physical_addr = physical;
     memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
-    current_directory = kernel_directory;
+    // current_directory = kernel_directory;
     unsigned int i = 0;
     while (i < sys_brk) {
         alloc_frame(get_page(i, 1, kernel_directory), 0, 0);
         i += 0x1000;
     }
+    // uint32_t physical;
+    // kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
+    // kernel_directory->physical_addr = physical;
+    // memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
+    // kernel_directory->tables[0] = (page_table_t *)kmalloc(sizeof(page_table_t), 1, &physical) ;
+    // kernel_directory->tables_physical[0] = physical;
+    // memset((uint8_t *)kernel_directory->tables[0], 0, sizeof(page_table_t));
+    // uint32_t dir[1024] __attribute__((aligned(4096)));
+    // unsigned int i;
+    // for (i = 0; i < 1024; ++i) {
+    //     dir[i] = 0x2;
+    // }
+    // page_table_t pt __attribute__((aligned(4096)));
+    // for (i = 0; i < 1024; ++i) {
+    //     pt.pages[i].present = 1;
+    //     pt.pages[i].rw = 1;
+    //     pt.pages[i].frame_addr = i;
+    // }
+    // dir[0] = ((uint32_t)pt.pages) | 3;
+    // for (i = 0; i < 1024; ++i) {
+    //     kernel_directory->tables[0]->pages[i].present = 1;
+    //     kernel_directory->tables[0]->pages[i].rw = 1;
+    //     kernel_directory->tables[0]->pages[i].frame_addr = i; // Not really
+    // }
+    // kernel_directory->tables_physical[0] |= 3;
     register_interrupt_handler(14, page_fault_handler);
     load_page_directory(kernel_directory);
 }
@@ -48,7 +76,7 @@ void init_paging() {
  */
 void load_page_directory(page_directory_t *page_directory) {
     current_directory = page_directory;
-    asm volatile("mov %0, %%cr3" : : "r"(&page_directory->tables_physical));
+    asm volatile("mov %0, %%cr3" : : "r"(page_directory->tables_physical));
     uint32_t cr0;
     asm volatile("mov %%cr0, %0" : "=r"(cr0));
     cr0 |= 0x80000000; // Set paging bit
@@ -69,8 +97,14 @@ page_t *get_page(uint32_t address, int make, page_directory_t *page_directory) {
     } else if (make) {
         uint32_t tmp;
         page_directory->tables[table_index] = (page_table_t *)kmalloc(sizeof(page_table_t), 1, &tmp);
-        memset((uint8_t *)page_directory->tables[table_index], 0, 0x1000);
-        page_directory->tables_physical[table_index] = tmp | 0x7; // Present, r/w, user
+        memset((uint8_t *)page_directory->tables[table_index], 0, sizeof(page_table_t));
+        page_directory->tables_physical[table_index] = tmp | 0x3; // Present, r/w, kernel
+        unsigned int i;
+        for (i = 0; i < 1024; ++i) {
+            page_directory->tables[table_index]->pages[i].present = 1;
+            page_directory->tables[table_index]->pages[i].rw = 1;
+            page_directory->tables[table_index]->pages[i].frame_addr = i;
+        }
         return &page_directory->tables[table_index]->pages[address%1024];
     } else return 0;
 }
@@ -96,7 +130,7 @@ void page_fault_handler(registers_t *r) {
     itoa(faulting_address, addr, 16);
     kprint(addr);
     kprint("\n");
-    kprint("*** System panic: page fault ***\n");
+    panic("page fault");
 }
 
 // Private functions
@@ -125,12 +159,12 @@ static void clear_frame(uint32_t frame_address) {
  * @param frame_address         Address of the frame.
  * @return                      Zero if frame is not set.
  */
-/*static uint32_t test_frame(uint32_t frame_address) {
-    uint32_t frame = frame_address / 0x1000;
-    uint32_t index = INDEX(frame);
-    uint32_t offset = OFFSET(frame);
-    return (frames[index] & (0x1 << offset));
-}*/
+// static uint32_t test_frame(uint32_t frame_address) {
+//     uint32_t frame = frame_address / 0x1000;
+//     uint32_t index = INDEX(frame);
+//     uint32_t offset = OFFSET(frame);
+//     return (frames[index] & (0x1 << offset));
+// }
 
 /* Find the first free frame in memory. Very efficient implementation.
  * @return                      Address of the first free frame.
@@ -157,8 +191,7 @@ void alloc_frame(page_t *page, int is_kernel, int is_writable) {
     if (page->frame_addr != 0) return; // Already allocated frame
     uint32_t index = first_free_frame();
     if (index == (uint32_t)-1) { // If there are no free frames
-        kprint("*** System panic: no free frames ***\n");
-        asm volatile("hlt");
+        panic("no free frames");
         return;
     }
     set_frame(index * 0x1000);

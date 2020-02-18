@@ -16,10 +16,10 @@ void kmain() {
     // Setup paging
     init_paging();
     // Some basic tests
-    // clear_screen();
+    clear_screen();
     kprint("OwlOS v0.1\n\n> ");
     // Test paging
     // uint32_t *ptr = (uint32_t *)0xa0000000;
     // uint32_t do_page_fault = *ptr;
-    // (void)(do_page_fault); // Unused variable
+    // (void)(do_page_fault); // Unused variable, just for test
 }

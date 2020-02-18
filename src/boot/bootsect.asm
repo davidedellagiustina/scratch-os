@@ -62,8 +62,8 @@ pm_init:
 
 ; Main routine
 main:
-    call KERNEL_OFFSET
-    jmp $
+    call KERNEL_OFFSET ; Transfer control to kernel
+    jmp $ ; We should never get back here
 
 BOOT_DRIVE: db 0
 BOOTING_OS_MSG: db 'Booting OwlOs...', 0
