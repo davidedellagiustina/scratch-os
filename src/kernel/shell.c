@@ -10,10 +10,11 @@ void parse_input(char *cmd) {
         kprint("Halting the CPU...");
         asm volatile("hlt");
     } else if (strcmp(cmd, "mkpage") == 0) {
-        uint32_t page, physical;
+        void *page;
+        physical_address_t physical;
         page = kmalloc(1000, 1, &physical);
         char page_str[16] = "", physical_str[16] = "";
-        itoa(page, page_str, 16);
+        itoa((physical_address_t)page, page_str, 16);
         itoa(physical, physical_str, 16);
         kprint("Page: 0x");
         kprint(page_str);

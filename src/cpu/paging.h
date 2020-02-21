@@ -32,7 +32,7 @@ typedef struct {
 typedef struct {
     page_table_t *tables[1024];
     uint32_t tables_physical[1024];
-    uint32_t physical_addr;
+    physical_address_t physical_addr;
 } page_directory_t;
 
 /* Initialize paging environment.

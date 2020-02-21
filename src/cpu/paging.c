@@ -7,7 +7,7 @@
 uint32_t *frames; // Bitset of frames
 uint32_t nframes;
 
-extern uint32_t sys_brk; // Declared in 'mem.c'
+extern physical_address_t sys_brk; // Declared in 'mem.c'
 page_directory_t *kernel_directory, *current_directory;
 
 #define INDEX(x)        (x / 32)
@@ -27,8 +27,7 @@ void free_frame(page_t *page);
 /* Initialize paging environment.
  */
 void init_paging() {
-    // uint32_t mem_end_page = 0x1000000; // 16MB of physical memory
-    uint32_t mem_end_page = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB
+    uint32_t mem_end_page = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
     nframes = mem_end_page / 0x1000;
     frames = (uint32_t *)kmalloc(INDEX(nframes), 0, 0);
     memset((uint8_t *)frames, 0, INDEX(nframes));
@@ -36,37 +35,11 @@ void init_paging() {
     kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
     kernel_directory->physical_addr = physical;
     memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
-    // current_directory = kernel_directory;
     unsigned int i = 0;
     while (i < sys_brk) {
         alloc_frame(get_page(i, 1, kernel_directory), 0, 0);
         i += 0x1000;
     }
-    // uint32_t physical;
-    // kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
-    // kernel_directory->physical_addr = physical;
-    // memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
-    // kernel_directory->tables[0] = (page_table_t *)kmalloc(sizeof(page_table_t), 1, &physical) ;
-    // kernel_directory->tables_physical[0] = physical;
-    // memset((uint8_t *)kernel_directory->tables[0], 0, sizeof(page_table_t));
-    // uint32_t dir[1024] __attribute__((aligned(4096)));
-    // unsigned int i;
-    // for (i = 0; i < 1024; ++i) {
-    //     dir[i] = 0x2;
-    // }
-    // page_table_t pt __attribute__((aligned(4096)));
-    // for (i = 0; i < 1024; ++i) {
-    //     pt.pages[i].present = 1;
-    //     pt.pages[i].rw = 1;
-    //     pt.pages[i].frame_addr = i;
-    // }
-    // dir[0] = ((uint32_t)pt.pages) | 3;
-    // for (i = 0; i < 1024; ++i) {
-    //     kernel_directory->tables[0]->pages[i].present = 1;
-    //     kernel_directory->tables[0]->pages[i].rw = 1;
-    //     kernel_directory->tables[0]->pages[i].frame_addr = i; // Not really
-    // }
-    // kernel_directory->tables_physical[0] |= 3;
     register_interrupt_handler(14, page_fault_handler);
     load_page_directory(kernel_directory);
 }
