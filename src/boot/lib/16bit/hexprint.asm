@@ -4,7 +4,7 @@
 
 [bits 16]
 
-; @param dx
+; @param dx     Value to print
 hexprint:
     pusha
     mov cx, 4

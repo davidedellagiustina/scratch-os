@@ -5,7 +5,7 @@
 ENTRY(kernel_entry) /* Kernel entry label */
 
 SECTIONS {
-    . = 0xc0001000; /* Kernel code is relocated at 3GB + 4KB */
+    . = 0xc0004000; /* Kernel code is relocated at 3GB + 0x3500 */
 
     .text ALIGN (0x1000) : AT(ADDR(.text)-0xc0000000) /* Align at 4KB and load at 4KB */
     {

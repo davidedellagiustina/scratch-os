@@ -4,7 +4,8 @@
 
 [org 0x7c00]
 
-KERNEL_OFFSET equ 0x3500
+KERNEL_PHYSICAL_ADDR equ 0x4000
+KERNEL_VIRTUAL_ADDR equ 0xc0004000
 SECOND_STAGE_BOOTLOADER equ 0x1000
 
 [bits 16]
@@ -44,7 +45,7 @@ load_second_stage:
 load_kernel:
     mov al, 0x02
     add al, SECOND_STAGE_BL_SECTORS_SIZE
-    mov bx, KERNEL_OFFSET
+    mov bx, KERNEL_PHYSICAL_ADDR
     mov dh, KERNEL_SECTORS_SIZE ; This variable is defined by the assembler at compile-time
     mov dl, [BOOT_DRIVE]
     call loaddisk
@@ -76,7 +77,7 @@ pm_init:
 ; Main routine
 main:
     call SECOND_STAGE_BOOTLOADER ; Enable paging and relocate kernel
-    call KERNEL_OFFSET ; Transfer control to kernel
+    call KERNEL_VIRTUAL_ADDR ; Transfer control to kernel
     jmp $ ; We should never get back here
 
 BOOT_DRIVE: db 0

@@ -43,8 +43,7 @@ src/boot/second_stage.bin: src/boot/second_stage.o
 	$(SH) $(SFLAGS) -c "$(LD) -e second_stage_bootloader -Ttext 0x1000 $^ -o $@ --oformat binary"
 
 src/kernel/kernel.bin: src/kernel/kernel_entry.o $(OBJ)
-	# $(SH) $(SFLAGS) -c "$(LD) -e kmain -T link.ld $^ -o $@ --oformat binary"
-	$(SH) $(SFLAGS) -c "$(LD) -e kmain -Ttext 0x3500 $^ -o $@ --oformat binary"
+	$(SH) $(SFLAGS) -c "$(LD) -e kmain -T link.ld $^ -o $@ --oformat binary"
 
 out/os-image.bin: src/boot/bootsect.bin src/boot/second_stage.bin src/kernel/kernel.bin
 	$(SH) $(SFLAGS) -c "cat $^ > $@"
