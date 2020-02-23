@@ -9,7 +9,7 @@
 #include "../cpu/ports.h"
 #include "../libc/mem.h"
 
-static const int VIDEO_ADDRESS = 0xb8000;
+static const int VIDEO_ADDRESS = 0xc00b8000; // Virtual address for higher-half kernel (mapped to 0xb8000)
 
 static const int MAX_ROWS = 25;
 static const int MAX_COLS = 80;

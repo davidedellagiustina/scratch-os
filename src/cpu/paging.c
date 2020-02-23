@@ -50,10 +50,7 @@ void init_paging() {
 void load_page_directory(page_directory_t *page_directory) {
     current_directory = page_directory;
     asm volatile("mov %0, %%cr3" : : "r"(page_directory->tables_physical));
-    uint32_t cr0;
-    asm volatile("mov %%cr0, %0" : "=r"(cr0));
-    cr0 |= 0x80000000; // Set paging bit
-    asm volatile("mov %0, %%cr0" : : "r"(cr0));
+    // Since paging was enabled back before the kernel was loaded, we do not need to set the PG bit in cr0 here
 }
 
 /* Retrieve the pointer to the required page.

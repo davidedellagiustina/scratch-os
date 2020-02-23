@@ -9,7 +9,7 @@
 
 /* Kernel main.
  */
-void kmain() {
+void kmain() {  
     // Install interrupt handlers
     isr_install();
     irq_init();
