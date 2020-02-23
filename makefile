@@ -10,6 +10,9 @@ OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
 KERNEL_SIZE = $$(wc -c < 'src/kernel/kernel.bin') # Compute kernel size (in bytes)
 KERNEL_SECTORS_SIZE = $$((($(KERNEL_SIZE)+511)/512)) # Compute kernel size (in sectors)
 
+SECOND_STAGE_BL_SIZE = $$(wc -c < 'src/boot/second_stage.bin') # Compute second-stage bootloader size (in bytes)
+SECOND_STAGE_BL_SECTORS_SIZE = $$((($(SECOND_STAGE_BL_SIZE)+511)/512)) # Compute second-stage bootloader size (in sectors)
+
 SH = bash
 SFLAGS = -i
 CC = i386-elf-gcc
@@ -25,9 +28,10 @@ RAM_SIZE = 128 # RAM size in MB
 
 all: out/os-image.bin # Default target
 
-%.bin: %.asm src/kernel/kernel.bin
+%.bin: %.asm src/boot/second_stage.bin src/kernel/kernel.bin
+	$(SH) $(FLAGS) -c "echo Second-stage bootloader takes $(SECOND_STAGE_BL_SECTORS_SIZE) sectors"
 	$(SH) $(FLAGS) -c "echo Kernel takes $(KERNEL_SECTORS_SIZE) sectors"
-	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) $< -o $@"
+	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) -dSECOND_STAGE_BL_SECTORS_SIZE=$(SECOND_STAGE_BL_SECTORS_SIZE) $< -o $@"
 
 %.o: %.asm
 	$(SH) $(SFLAGS) -c "nasm -felf $< -o $@"
@@ -35,10 +39,14 @@ all: out/os-image.bin # Default target
 %.o: %.c $(C_HEADERS)
 	$(SH) $(SFLAGS) -c "$(CC) $(CFLAGS) -DTOTAL_RAM_SIZE=$(RAM_SIZE) -ffreestanding -c $< -o $@"
 
-src/kernel/kernel.bin: src/kernel/kernel_entry.o $(OBJ)
-	$(SH) $(SFLAGS) -c "$(LD) -e kmain -T link.ld $^ -o $@ --oformat binary"
+src/boot/second_stage.bin: src/boot/second_stage.o
+	$(SH) $(SFLAGS) -c "$(LD) -e second_stage_bootloader -Ttext 0x1000 $^ -o $@ --oformat binary"
 
-out/os-image.bin: src/boot/bootsect.bin src/kernel/kernel.bin
+src/kernel/kernel.bin: src/kernel/kernel_entry.o $(OBJ)
+	# $(SH) $(SFLAGS) -c "$(LD) -e kmain -T link.ld $^ -o $@ --oformat binary"
+	$(SH) $(SFLAGS) -c "$(LD) -e kmain -Ttext 0x3500 $^ -o $@ --oformat binary"
+
+out/os-image.bin: src/boot/bootsect.bin src/boot/second_stage.bin src/kernel/kernel.bin
 	$(SH) $(SFLAGS) -c "cat $^ > $@"
 
 run: all

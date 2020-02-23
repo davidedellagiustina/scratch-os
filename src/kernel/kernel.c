@@ -14,7 +14,7 @@ void kmain() {
     isr_install();
     irq_init();
     // Setup paging
-    init_paging();
+    // init_paging();
     // Some basic tests
     clear_screen();
     kprint("OwlOS v0.1\n\n> ");

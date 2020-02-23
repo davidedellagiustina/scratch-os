@@ -5,24 +5,24 @@
 ENTRY(kernel_entry) /* Kernel entry label */
 
 SECTIONS {
-    . = 0x1000; /* Load kernel code at this address */
+    . = 0xc0001000; /* Kernel code is relocated at 3GB + 4KB */
 
-    .text ALIGN (0x1000) : /* Align at 4KB */
+    .text ALIGN (0x1000) : AT(ADDR(.text)-0xc0000000) /* Align at 4KB and load at 4KB */
     {
         *(.text) /* All text sections from all files */
     }
 
-    .rodata ALIGN (0x1000) : /* Align at 4KB */
+    .rodata ALIGN (0x1000) : AT(ADDR(.rodata)-0xc0000000) /* Align at 4KB and load at 4KB */
     {
         *(.rodata*) /* All read-only data sections from all files */
     }
 
-    .data ALIGN (0x1000) : /* Align at 4KB */
+    .data ALIGN (0x1000) : AT(ADDR(.data)-0xc0000000) /* Align at 4KB and load at 4KB */
     {
         *(.data) /* All data sections from all files */
     }
 
-    .bss ALIGN (0x1000) : /* Align at 4KB */
+    .bss ALIGN (0x1000) : AT(ADDR(.bss)-0xc0000000) /* Align at 4KB and load at 4KB */
     {
         *(COMMON) /* All COMMON sections from all files */
         *(.bss) /* All bss sections from all files */
