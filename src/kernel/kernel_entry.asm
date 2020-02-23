@@ -5,5 +5,8 @@
 [bits 32]
 [extern kmain]
 
-call kmain
-jmp $ ; Control should never get back there, just for prevention
+global kernel_entry
+
+kernel_entry:
+    call kmain
+    jmp $ ; Control should never get back there, just for prevention
