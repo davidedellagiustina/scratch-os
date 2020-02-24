@@ -2,7 +2,7 @@
 # @author	Davide Della Giustina
 # @date		14/11/2019
 
-
+ASM_LIBS = $(wildcard src/boot/lib/16bit/*.asm src/boot/lib/32bit/*.asm)
 C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c)
 C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h src/libc/*.h)
 OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
@@ -28,7 +28,7 @@ RAM_SIZE = 128 # RAM size in MB
 
 all: out/os-image.bin # Default target
 
-%.bin: %.asm src/boot/second_stage.bin src/kernel/kernel.bin
+%.bin: %.asm src/boot/second_stage.bin src/kernel/kernel.bin $(ASM_LIBS)
 	$(SH) $(FLAGS) -c "echo Second-stage bootloader takes $(SECOND_STAGE_BL_SECTORS_SIZE) sectors"
 	$(SH) $(FLAGS) -c "echo Kernel takes $(KERNEL_SECTORS_SIZE) sectors"
 	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) -dSECOND_STAGE_BL_SECTORS_SIZE=$(SECOND_STAGE_BL_SECTORS_SIZE) $< -o $@"
