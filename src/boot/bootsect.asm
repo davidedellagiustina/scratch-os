@@ -4,6 +4,7 @@
 
 [org 0x7c00]
 
+BOOT_STACK_SIZE equ 64 ; In bytes
 KERNEL_PHYSICAL_ADDR equ 0x4000
 KERNEL_VIRTUAL_ADDR equ 0xc0004000
 SECOND_STAGE_BOOTLOADER equ 0x1000
@@ -24,7 +25,7 @@ jmp init
 ; Initialization
 init:
     mov [BOOT_DRIVE], dl ; Boot drive number is stored by the BIOS, so save it
-    mov bp, 0x9000 ; Stack
+    mov bp, BOOT_STACK + BOOT_STACK_SIZE ; Stack
     mov sp, bp
     mov bx, BOOTING_OS_MSG ; Boot message
     call print
@@ -70,8 +71,6 @@ pm_init:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov ebp, 0x90000 ; Stack
-    mov esp, ebp
     call main
 
 ; Main routine
@@ -82,6 +81,7 @@ main:
 
 BOOT_DRIVE: db 0
 BOOTING_OS_MSG: db 'Booting OwlOs...', 0
+BOOT_STACK: times BOOT_STACK_SIZE db 0 ; Reserved space for boot stack
 
 times 510-($-$$) db 0 ; Padding to 1 whole sector (512B)
 dw 0xaa55 ; Magic number

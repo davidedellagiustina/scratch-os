@@ -24,14 +24,15 @@ void free_frame(page_t *page);
 
 // Public functions
 
-/* Initialize paging environment.
+/* Setup paging environment.
+ * (New page directory, different from the boot one, with no identity mapping).
  */
-void init_paging() {
+void setup_paging() {
     uint32_t mem_end_page = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
     nframes = mem_end_page / 0x1000;
     frames = (uint32_t *)kmalloc(INDEX(nframes), 0, 0);
     memset((uint8_t *)frames, 0, INDEX(nframes));
-    uint32_t physical;
+    physical_address_t physical;
     kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &physical);
     kernel_directory->physical_addr = physical;
     memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
@@ -41,13 +42,13 @@ void init_paging() {
         i += 0x1000;
     }
     register_interrupt_handler(14, page_fault_handler);
-    load_page_directory(kernel_directory);
+    switch_page_directory(kernel_directory);
 }
 
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
-void load_page_directory(page_directory_t *page_directory) {
+void switch_page_directory(page_directory_t *page_directory) {
     current_directory = page_directory;
     asm volatile("mov %0, %%cr3" : : "r"(page_directory->tables_physical));
     // Since paging was enabled back before the kernel was loaded, we do not need to set the PG bit in cr0 here
@@ -101,6 +102,8 @@ void page_fault_handler(registers_t *r) {
     kprint(addr);
     kprint("\n");
     panic("page fault");
+    // TODO: must swap pages and load necessary ones!
+    // NEEDED: disk driver!
 }
 
 // Private functions

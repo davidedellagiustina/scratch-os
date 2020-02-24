@@ -28,21 +28,22 @@ typedef struct {
     page_t pages[1024];
 } page_table_t;
 
-// Page directory (array of 1024 page tables)
+// Page directory (array of 1024 page tables [pointers!])
 typedef struct {
     page_table_t *tables[1024];
     uint32_t tables_physical[1024];
     physical_address_t physical_addr;
 } page_directory_t;
 
-/* Initialize paging environment.
+/* Setup paging environment.
+ * (New page directory, different from the boot one, with no identity mapping).
  */
-void init_paging();
+void setup_paging();
 
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
-void load_page_directory(page_directory_t *page_directory);
+void switch_page_directory(page_directory_t *page_directory);
 
 /* Retrieve the pointer to the required page.
  * @param address               Address of the required page.

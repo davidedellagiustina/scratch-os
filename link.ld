@@ -7,6 +7,9 @@ ENTRY(kernel_entry) /* Kernel entry label */
 SECTIONS {
     . = 0xc0004000; /* Kernel code is relocated at 3GB + 0x3500 */
 
+    kernel_virtual_start = .; /* Export labels */
+    kernel_physical_start = . - 0xc0000000;
+
     .text ALIGN (0x1000) : AT(ADDR(.text)-0xc0000000) /* Align at 4KB and load at 4KB */
     {
         *(.text) /* All text sections from all files */
@@ -27,4 +30,7 @@ SECTIONS {
         *(COMMON) /* All COMMON sections from all files */
         *(.bss) /* All bss sections from all files */
     }
+
+    kernel_virtual_end = .; /* Export labels */
+    kernel_physical_end = . - 0xc0000000;
 }

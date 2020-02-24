@@ -9,12 +9,13 @@
 
 /* Kernel main.
  */
-void kmain() {  
+void kmain(void *kvs, void *kve, physical_address_t kps, physical_address_t kpe) {
+    (void)kvs; (void)kve; (void)kps; (void)kpe;
     // Install interrupt handlers
     isr_install();
     irq_init();
     // Setup paging
-    // init_paging();
+    // setup_paging();
     // Some basic tests
     clear_screen();
     kprint("OwlOS v0.1\n\n> ");

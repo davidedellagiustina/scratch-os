@@ -52,7 +52,7 @@ set_page_dir:
     mov [edx], eax
     add edx, 4*KERNEL_PAGE_NUMBER ; PD entry for kìvirtual kernel's PT
     mov eax, [edx] ; Set page table for kernel virtual address
-    or eax, 0x3 ; Presence bit (not writable page table!)
+    or eax, 0x1 ; Presence bit (not writable page table!)
     mov [edx], eax
     popa
     ret
