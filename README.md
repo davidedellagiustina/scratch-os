@@ -1,4 +1,4 @@
-# OwlOS
+# ScratchOS
 
 OwlOS is a tiny operating system developed for learning purposes. It is currently under development.
 
