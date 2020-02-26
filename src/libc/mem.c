@@ -25,22 +25,3 @@ void memset(uint8_t *dst, uint8_t val, size_t len) {
     uint8_t *temp = (uint8_t *)dst;
     for (; len != 0; --len) *temp++ = val;
 }
-
-physical_address_t sys_brk = 0x10000;
-
-/* Memory allocator.
- * @param size          Size of the memory chunk needed.
- * @param align         Pages should be aligned (4K)?
- * @param physical      Physical base address of the allocated memory (buffer).
- * @return              Pointer to allocated memory.
- */
-void *kmalloc(size_t size, int align, physical_address_t *physical) {
-    if (align == 1 && (sys_brk & 0xfffff000)) {
-        sys_brk &= 0xfffff000;
-        sys_brk += 0x1000; // 4K
-    }
-    if (physical) *physical = sys_brk;
-    uint32_t r = sys_brk;
-    sys_brk += size;
-    return (void *)r;
-}

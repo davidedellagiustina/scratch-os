@@ -4,7 +4,7 @@
 
 [org 0x7c00]
 
-BOOT_STACK_SIZE equ 64 ; In bytes
+BOOT_STACK_SIZE equ 80 ; In bytes
 KERNEL_PHYSICAL_ADDR equ 0x4000
 KERNEL_VIRTUAL_ADDR equ 0xc0004000
 SECOND_STAGE_BOOTLOADER equ 0x1000
@@ -76,11 +76,12 @@ pm_init:
 ; Main routine
 main:
     call SECOND_STAGE_BOOTLOADER ; Enable paging and relocate kernel
-    call KERNEL_VIRTUAL_ADDR ; Transfer control to kernel
+    lea ecx, [KERNEL_VIRTUAL_ADDR]
+    jmp ecx ; Transfer control to kernel (higher-half virtual addresses!)
     jmp $ ; We should never get back here
 
 BOOT_DRIVE: db 0
-BOOTING_OS_MSG: db 'Booting OwlOs...', 0
+BOOTING_OS_MSG: db 'Booting ScratchOs...', 0
 BOOT_STACK: times BOOT_STACK_SIZE db 0 ; Reserved space for boot stack
 
 times 510-($-$$) db 0 ; Padding to 1 whole sector (512B)

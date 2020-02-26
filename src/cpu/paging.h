@@ -6,6 +6,7 @@
 #define PAGING_H
 
 #include "../drivers/vga.h"
+#include "../kernel/heap.h"
 #include "../libc/mem.h"
 #include "isr.h"
 #include "panic.h"
@@ -32,26 +33,22 @@ typedef struct {
 typedef struct {
     page_table_t *tables[1024];
     uint32_t tables_physical[1024];
-    physical_address_t physical_addr;
+    physaddr_t physical_addr;
 } page_directory_t;
 
 /* Setup paging environment.
  * (New page directory, different from the boot one, with no identity mapping).
+ * @param kvs       Pointer to virtual kernel start.
+ * @param kve       Pointer to virtual kernel end.
+ * @param kps       Physical address of kernel start.
+ * @param kpe       Physical address of kernel end.
  */
-void setup_paging();
+void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe);
 
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
 void switch_page_directory(page_directory_t *page_directory);
-
-/* Retrieve the pointer to the required page.
- * @param address               Address of the required page.
- * @param make                  If set, the page table should be created if it is not found.
- * @param page_directory        Page directory.
- * @return                      Pointer to the required page.
- */
-page_t *get_page(uint32_t address, int make, page_directory_t *page_directory);
 
 /* Page faults handler function.
  * @param r                     Registers.

@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef uint32_t physical_address_t; // Typedef for physical addresses (i.e. 32bit unsigned integers)
+typedef uint32_t physaddr_t; // Typedef for physical addresses (i.e. 32bit unsigned integers)
 
 /* Copy a portion of memory from a source to a destination.
  * @param src           Source address.
@@ -23,13 +23,5 @@ void memcpy(uint8_t *src, uint8_t *dst, int nbytes);
  * @param len           Length of memory portion.
  */
 void memset(uint8_t *dst, uint8_t val, size_t len);
-
-/* Memory allocator.
- * @param size          Size of the memory chunk needed.
- * @param align         Pages should be aligned (4K)?
- * @param physical      Physical base address of the allocated memory (buffer).
- * @return              Pointer to allocated memory.
- */
-void *kmalloc(size_t size, int align, physical_address_t *physical);
 
 #endif

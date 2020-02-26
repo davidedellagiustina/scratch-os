@@ -33,7 +33,7 @@ pgtbl_loop:
     je pgtbl_exit ; Then exit loop
     mov eax, ecx ; Otherwise EAX = entry number
     shl eax, 12 ; Set frame address (i.e. entry number << 12)
-    or eax, 0x1 ; Set presence bit (not writable page!)
+    or eax, 0x3 ; Set presence bit
     mov [edx], eax ; Set page table entry
     add ecx, 1 ; Increment entry number
     add edx, 4 ; Next page table entry
@@ -48,11 +48,11 @@ set_page_dir:
     pusha
     mov edx, BOOT_PAGE_DIR ; EDX -> Pointer to page directory entry
     mov eax, [edx] ; Set page table nr.0 address (identity-mapping)
-    or eax, 0x1 ; Presence bit (not writable page table!)
+    or eax, 0x3 ; Presence bit
     mov [edx], eax
-    add edx, 4*KERNEL_PAGE_NUMBER ; PD entry for kìvirtual kernel's PT
+    add edx, 4*KERNEL_PAGE_NUMBER ; PD entry for virtual kernel's PT
     mov eax, [edx] ; Set page table for kernel virtual address
-    or eax, 0x1 ; Presence bit (not writable page table!)
+    or eax, 0x3 ; Presence bit
     mov [edx], eax
     popa
     ret

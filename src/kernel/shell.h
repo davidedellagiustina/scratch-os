@@ -7,6 +7,8 @@
 #include "../libc/mem.h"
 #include "../libc/string.h"
 
+#include "heap.h"
+
 /* Parse basic shell commands.
  * @param cmd           Input command.
  */
