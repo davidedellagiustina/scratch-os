@@ -31,8 +31,8 @@ typedef struct {
 
 // Page directory (array of 1024 page tables [pointers!])
 typedef struct {
-    page_table_t *tables[1024];
     uint32_t tables_physical[1024];
+    page_table_t *tables[1024];
     physaddr_t physical_addr;
 } page_directory_t;
 

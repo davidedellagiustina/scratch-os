@@ -10,7 +10,7 @@ gdt_null: ; Mandatory null segment descriptor
     dd 0x0
     dd 0x0
 
-gdt_code: ; Kernel-mode code segment dscriptor
+gdt_code: ; Kernel-mode code segment descriptor
     ; Base -> 0x0 | Limit -> 0xfffff
     ; 1st flags: present=1, privilege=00, descriptor-type=1 -> 1001b
     ; Type flags: code=1, conforming=0, readable=1, accessed=0 -> 1010b

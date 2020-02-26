@@ -9,13 +9,10 @@ uint32_t nframes;
 
 physaddr_t boot_directory; // Backup of the boot directory
 page_directory_t *kernel_directory, *current_directory;
+physaddr_t first_mb_idmap; // Page table that identity maps the first MB of memory (needed for PD switch)
 
 #define INDEX(x)        (x / 32)
 #define OFFSET(x)       (x % 32)
-
-static inline void s(void *p) {
-    __asm volatile("mov %0,%%cr3"::"r"(p));
-}
 
 // Private functions
 
@@ -26,22 +23,6 @@ static uint32_t first_free_frame();
 void alloc_frame(page_t *page, int is_kernel, int is_writable);
 void free_frame(page_t *page);
 void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t is_kernel, uint8_t is_writable);
-
-// TEMP: Test function
-// void test(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
-//     (void)kvs; (void)kve; (void)kps; (void)kpe;
-//     asm volatile("mov %%cr3, %0" : "=r"(boot_directory));
-//     kbrk(kve);
-//     char b[20];
-//     itoa(boot_directory, b, 16);
-//     kprint(b);
-//     // asm volatile("mov %0, %%cr3" : : "r"(boot_directory));
-//     // asm volatile("mov %0, %%eax" : : "r"(boot_directory));
-//     // asm volatile("mov %%eax, %%cr3" : :);
-//     // asm volatile("invlpg (%0)" : : "r"(768) : "memory");
-//     // s((void *)boot_directory);
-//     // asm volatile("l: jmp l");
-// }
 
 // Public functions
 
@@ -55,16 +36,52 @@ void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t
 void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     // Backup boot page directory
     asm volatile("mov %%cr3, %0" : "=r"(boot_directory));
+    // Create fake idmap page table
+    page_table_t *fake = (page_table_t *)kcalloc(sizeof(page_table_t), 1, &first_mb_idmap);
+    uint32_t i;
+    for (i = 0; i < 1024; ++i) {
+        fake->pages[i].present = 1;
+        fake->pages[i].rw = 1;
+        fake->pages[i].frame_addr = i;
+    }
     // Create and fill new page directory (in kernel heap) and page tables
-    kbrk(kve); // Set kernel heap start just after the kernel text segment
-    uint32_t mem_size = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
-    nframes = mem_size / 0x1000;
+    // uint32_t mem_size = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
+    // nframes = mem_size / 0x1000;
     // frames = (uint32_t *)kcalloc(INDEX(nframes), 0, 0); // Allocate bitmap
-    physaddr_t phys;
-    // kernel_directory = (page_directory_t *)kcalloc(sizeof(page_directory_t), 1, &phys); // Allocate new page directory
-    kernel_directory = (page_directory_t *)kmalloc(sizeof(page_directory_t), 1, &phys); // Allocate new page directory
-    memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
-    kernel_directory->physical_addr = phys;
+    // physaddr_t phys;
+    // kernel_directory = (page_directory_t *)kcalloc(sizeof(page_directory_t), 1, &phys); // Allocate new empty page directory
+    // kernel_directory->physical_addr = phys;
+
+    // physaddr_t dir = 0x10000;
+    physaddr_t dir;
+    // kernel_directory = (page_directory_t *)(phys + 0xc0000000);
+    // memset((uint8_t *)kernel_directory, 0, sizeof(page_directory_t));
+    // kernel_directory->physical_addr = phys;
+
+    page_directory_t *pd = (page_directory_t *)kcalloc(sizeof(page_directory_t), 1, &dir);
+    pd->physical_addr = dir;
+    // dir += 0x1000;
+    // memset((uint8_t *)(dir+0xc0000000), 0, 0x1000);
+
+    // physaddr_t pt = 0x13000;
+    physaddr_t pt;
+    page_table_t *tbl = (page_table_t *)kcalloc(sizeof(page_table_t), 1, &pt);
+    // memset((uint8_t *)(pt+0xc0000000), 0, 0x1000);
+    // *((uint32_t *)(dir+0xc0000000)) = pt | 0x3;
+
+    // *((uint32_t *)(dir+0xc0000000)) = first_mb_idmap | 0x3;
+    // *((uint32_t *)(dir+0xc0000000)+768) = pt | 0x3;
+    // pd->tables_physical[0] = first_mb_idmap | 0x3;
+    pd->tables[768] = tbl;
+    pd->tables_physical[768] = pt | 0x3;
+    for (i = 0; i < 1024; ++i) {
+        // *(((uint32_t *)(pt+0xc0000000))+i) = (i << 12) | 0x3;
+        tbl->pages[i].present = 1;
+        tbl->pages[i].rw = 1;
+        tbl->pages[i].frame_addr = i;
+    }
+
+
     // Map kernel text segment
     // kvs = (void *)((uint32_t)kvs & 0xfffff000);
     // kps &= 0xfffff000;
@@ -80,19 +97,36 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     //     kernel_directory->tables[pti]->pages[pi].rw = 1; // Page is writable
     //     kernel_directory->tables[pti]->pages[pi].user = 0; // Page is kernel mode
     //     kernel_directory->tables[pti]->pages[pi].frame_addr = (kps / 0x1000);
-    //     // set_frame(kps);
+    //     set_frame(kps);
     //     kvs += 0x1000; kps += 0x1000; // Increment pointers
     // }
 
-    kernel_directory->tables[768] = (page_table_t *)kmalloc(sizeof(page_table_t), 1, &phys);
-    memset((uint8_t *)kernel_directory->tables[768], 0, sizeof(page_table_t));
-    kernel_directory->tables_physical[768] = phys | 0x3; // Present, r/w, kernel
-    int i;
-    for (i = 0; i < 1024; ++i) {
-        kernel_directory->tables[768]->pages[i].present = 1;
-        kernel_directory->tables[768]->pages[i].rw = 1;
-        kernel_directory->tables[768]->pages[i].frame_addr = i;
-    }
+    // phys = 0x13000;
+    // kernel_directory->tables[0] = (page_table_t *)(phys + 0xc0000000);
+    // memset((uint8_t *)(kernel_directory->tables[0]), 0, sizeof(page_table_t));
+    // kernel_directory->tables_physical[0] = phys | 0x3;
+    // kernel_directory->tables[768] = (page_table_t *)(phys + 0xc0000000);
+    // kernel_directory->tables_physical[768] = phys | 0x3;
+
+
+    // kernel_directory->tables[768] = (page_table_t *)kmalloc(sizeof(page_table_t), 1, &phys);
+    // memset((uint8_t *)kernel_directory->tables[768], 0, sizeof(page_table_t));
+    // kernel_directory->tables_physical[768] = phys | 0x3; // Present, r/w, kernel
+    // kernel_directory->tables[0] = (page_table_t *)kcalloc(sizeof(page_table_t), 1, &phys);
+    // kernel_directory->tables_physical[0] = phys | 0x3;
+    // unsigned int i;
+    // for (i = 0; i < 1024; ++i) {
+        // kernel_directory->tables[768]->pages[i].present = 1;
+        // kernel_directory->tables[768]->pages[i].rw = 1;
+        // kernel_directory->tables[768]->pages[i].frame_addr = i;
+        // kernel_directory->tables[0]->pages[i].present = 1;
+        // kernel_directory->tables[0]->pages[i].rw = 1;
+        // kernel_directory->tables[0]->pages[i].frame_addr = i;
+
+        // ((uint32_t *)(kernel_directory->tables[0]))[i] = (i << 12) | 0x3;
+
+    // }
+    // 
     // uint32_t e = (uint32_t)ksbrk(0);
     // char buff[20];
     // itoa(e, buff, 16);
@@ -109,26 +143,39 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     //     set_frame(kps);
     //     kvs += 0x1000; kps += 0x1000; // Increment pointers
     // }
+
     // Register page fault handler and switch page directory
     register_interrupt_handler(14, page_fault_handler);
     // uint32_t end = ((page_table_t *)(kernel_directory->tables_physical[768] + 0xc0000000 - 3))->pages[0].frame_addr;
-    // uint32_t end = kernel_directory->tables[768]->pages[0].frame_addr;
-    uint32_t end = (uint32_t)setup_paging;
-    char buf[20];
-    itoa(end, buf, 16);
-    kprint("\n\nEnd of heap: "); kprint(buf);
+    // uint32_t end = kernel_directory->tables[768]->pages[1023].frame_addr;
+    // uint32_t end = (uint32_t)setup_paging;
+    // char buf[20];
+    // itoa(end, buf, 16);
+    // kprint("\n\nEnd of heap: "); kprint(buf);
     // asm volatile("l: jmp l");
-    switch_page_directory(kernel_directory);
+    // switch_page_directory(kernel_directory);
+    switch_page_directory(pd);
+    // asm volatile("mov %0, %%cr3" : : "r"(dir));
+    // asm volatile("mov %0, %%cr3" : : "r"(pd->physical_addr));
+    // asm volatile("mov %0, %%cr3" : : "r"(boot_directory));
     (void)kve; // Unused
 }
 
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
+extern void sswitch(void);
+
 void switch_page_directory(page_directory_t *page_directory) {
     current_directory = page_directory;
-    asm volatile("mov %0, %%cr3" : : "r"(page_directory->tables_physical));
-    // Since paging was enabled back before the kernel was loaded, we do not need to set the PG bit in cr0 here
+    // physaddr_t bkp = page_directory->tables_physical[0]; // Backup current mapping for first MB
+    page_directory->tables_physical[0] = first_mb_idmap | 0x3; // Identity map the first MB of memory
+    asm volatile("mov %0, %%cr3" : : "r"(page_directory->physical_addr)); // Switch page directory
+    // asm volatile("call sswitch");
+    // page_directory->tables_physical[0] = bkp; // Restore saved mapping
+    // physaddr_t cr3;
+    // asm volatile("mov %%cr3, %0" : "=r"(cr3));
+    // asm volatile("invlpg (%0)" : : "r"(cr3) : "memory"); // Invalidate first entry of TLB
 }
 
 // /* Retrieve the pointer to the required page.

@@ -24,7 +24,7 @@ kernel_entry:
     mov eax, cr3 ; Get rid of identity-mapping
     mov edx, 0
     mov [eax], edx
-    invlpg [0]
+    invlpg [eax] ; Invalidate TLB
     push kernel_physical_end ; Push labels to stack
     push kernel_physical_start
     push kernel_virtual_end

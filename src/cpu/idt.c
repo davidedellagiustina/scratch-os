@@ -21,5 +21,5 @@ void set_idt_gate(int n, uint32_t handler) {
 void load_idt() {
     idt_reg.base = (physaddr_t)&idt;
     idt_reg.limit = IDT_ENTRIES * sizeof(idt_gate_t) - 1; // 256 entries
-    asm volatile("lidt (%0)" : : "r" (&idt_reg)); // Load IDT with 'lidt' instruction
+    asm volatile("lidt (%0)" : : "r" ((physaddr_t)&idt_reg)); // Load IDT with 'lidt' instruction
 }

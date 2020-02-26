@@ -4,7 +4,7 @@
 
 #include "heap.h"
 
-void *kernel_brk; // Must be set before using kernel heap
+void *kernel_brk = (void *)0xc00b9000; // Virtual, aligned, after end of VGA memory (0xb8000 - 0xb8f9f)
 
 /* Set the kernel data segment limit to a certain address.
  * @param brk       New kernel data segment limit.

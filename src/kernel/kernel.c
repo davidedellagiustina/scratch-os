@@ -37,8 +37,8 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     kprint(" Done!\n");
     // Setup paging
     kprint("Setting up paging...");
-    // setup_paging(kvs, kve, kps, kpe);
-    (void)kvs; (void)kve; (void)kps; (void)kpe; // Unused variables until paging is fixed
+    setup_paging(kvs, kve, kps, kpe);
+    // (void)kvs; (void)kve; (void)kps; (void)kpe; // Unused variables until paging is fixed
     kprint(" Done!\n");
     // TEMP: Basic shell-like interface here
     clear_screen();
