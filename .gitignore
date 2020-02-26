@@ -14,5 +14,3 @@ src/libc/*.o
 
 out/os-image.bin
 out/floppy.img
-
-tmp/*
