@@ -32,7 +32,7 @@ const char keys_shift[] = { '?' /* Error */, '?' /* Esc */, '!', '"', (char)156 
  */
 static void keyboard_callback(registers_t *r) {
     uint8_t scancode = inb(SCANCODE_PORT);
-    // Special keys (shift, ctl, alt)
+    // Special keys (shift, ctrl, alt)
     if (scancode == LSHIFT || scancode == RSHIFT) shift_pressed = 1;
     else if (scancode == LSHIFT + KEYUP_EVENT_OFFSET || scancode == RSHIFT + KEYUP_EVENT_OFFSET) shift_pressed = 0;
     else if (scancode == LCTRL) ctrl_pressed = 1;
