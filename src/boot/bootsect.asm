@@ -76,6 +76,9 @@ pm_init:
 ; Main routine
 main:
     call SECOND_STAGE_BOOTLOADER ; Enable paging and relocate kernel
+    mov eax, gdt_descriptor ; Push gdt descriptor virtual address
+    add eax, 0xc0000000
+    push eax
     lea ecx, [KERNEL_VIRTUAL_ADDR]
     jmp ecx ; Transfer control to kernel (higher-half virtual addresses!)
     jmp $ ; We should never get back here

@@ -169,7 +169,7 @@ extern void sswitch(void);
 void switch_page_directory(page_directory_t *page_directory) {
     current_directory = page_directory;
     // physaddr_t bkp = page_directory->tables_physical[0]; // Backup current mapping for first MB
-    page_directory->tables_physical[0] = first_mb_idmap | 0x3; // Identity map the first MB of memory
+    // page_directory->tables_physical[0] = first_mb_idmap | 0x3; // Identity map the first MB of memory
     asm volatile("mov %0, %%cr3" : : "r"(page_directory->physical_addr)); // Switch page directory
     // asm volatile("call sswitch");
     // page_directory->tables_physical[0] = bkp; // Restore saved mapping

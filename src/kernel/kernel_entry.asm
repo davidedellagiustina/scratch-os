@@ -19,7 +19,14 @@ global kernel_entry
 ; Also reserve extra space for kernel stack
 section .text
 kernel_entry:
-    mov ebp, KERNEL_STACK + KERNEL_STACK_SIZE ; Setup stack
+    pop eax ; EAX -> GDT descriptor virtual address
+    mov edx, eax ; Rewrite GDT descriptor 2nd entry (i.e. GDT base address) with virtual address
+    add edx, 2
+    mov ebx, [edx]
+    add ebx, 0xc0000000
+    mov [edx], ebx
+    lgdt [eax] ; Reload GDT descriptor register (with virtual address)
+    mov ebp, KERNEL_STACK + KERNEL_STACK_SIZE ; Setup new kernel stack
     mov esp, ebp
     mov eax, cr3 ; Get rid of identity-mapping
     mov edx, 0
