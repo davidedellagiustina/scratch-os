@@ -28,7 +28,7 @@ RAM_SIZE = 128 # RAM size in MB
 
 all: out/os-image.bin # Default target
 
-%.bin: %.asm src/boot/second_stage.bin src/kernel/kernel.bin $(ASM_LIBS)
+%.bin: %.asm src/boot/second_stage.bin src/kernel/kernel.bin $(ASM_LIBS) src/boot/gdt.asm
 	$(SH) $(FLAGS) -c "echo Second-stage bootloader takes $(SECOND_STAGE_BL_SECTORS_SIZE) sectors"
 	$(SH) $(FLAGS) -c "echo Kernel takes $(KERNEL_SECTORS_SIZE) sectors"
 	$(SH) $(SFLAGS) -c "nasm -fbin -dKERNEL_SECTORS_SIZE=$(KERNEL_SECTORS_SIZE) -dSECOND_STAGE_BL_SECTORS_SIZE=$(SECOND_STAGE_BL_SECTORS_SIZE) $< -o $@"
