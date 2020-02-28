@@ -7,7 +7,7 @@
 #include "../cpu/paging.h"
 #include "../drivers/vga.h"
 
-/* Print ASCII art
+/* Print "ScratchOS" ASCII art.
  */
 void print_ascii_art() {
     kprint(" ____                 _       _      ___  ____\n");
@@ -26,12 +26,12 @@ void print_ascii_art() {
 void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     clear_screen();
     kprint("Booting ScratchOS v0.1...\n\n");
-    // Print some info
+    // Print some kernel info
     uint32_t kernel_size = ((kpe - kps) / 1024) - 4; // In KB, subtracting the size of kernel stack
     char buf[10]; itoa(kernel_size, buf, 10);
     kprint("Kernel approximate size: "); kprint(buf); kprint("KB.\n");
     // Install interrupt handlers
-    kprint("Installing interrupts...");
+    kprint("Installing interrupt vector and handlers...");
     isr_install();
     irq_init();
     kprint(" Done!\n");

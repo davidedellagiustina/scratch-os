@@ -4,7 +4,7 @@
 
 #include "heap.h"
 
-void *kernel_brk = (void *)0xc00b9000; // Virtual, aligned, after end of VGA memory (0xa0000 - 0xc0000)
+void *kernel_brk = (void *)0xc00c0000; // Virtual, aligned, after end of VGA memory (0xa0000 - 0xc0000)
 
 /* Set the kernel data segment limit to a certain address.
  * @param brk       New kernel data segment limit.
@@ -23,13 +23,13 @@ void *ksbrk(size_t incr) {
     return ptr;
 }
 
-/* Memory allocator.
+/* Dumb memory allocator (used for initializing paging).
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
  * @param physical      Physical base address of the allocated memory (buffer).
  * @return              Pointer to allocated memory.
  */
-void *kmalloc(size_t size, int align, physaddr_t *physical) {
+void *dumb_kmalloc(size_t size, int align, physaddr_t *physical) {
     uint32_t brk = (uint32_t)ksbrk(0); // Get current brk
     if (align && (brk & 0xfff)) {
         brk &= 0xfffff000;
@@ -40,14 +40,14 @@ void *kmalloc(size_t size, int align, physaddr_t *physical) {
     return ksbrk(size);
 }
 
-/* Memory allocator and initializator.
+/* Dumb memory allocator and initializator (used for initializing paging).
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
  * @param physical      Physical base address of the allocated memory (buffer).
  * @return              Pointer to allocated memory.
  */
-void *kcalloc(size_t size, int align, physaddr_t *physical) {
-    void *ptr = kmalloc(size, align, physical); // Allocate memory
+void *dumb_kcalloc(size_t size, int align, physaddr_t *physical) {
+    void *ptr = dumb_kmalloc(size, align, physical); // Allocate memory
     memset((uint8_t *)ptr, 0, size); // Initialize to zero
     return ptr;
 }

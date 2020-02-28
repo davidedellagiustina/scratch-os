@@ -18,20 +18,20 @@ void kbrk(void *brk);
  */
 void *ksbrk(size_t incr);
 
-/* Memory allocator.
+/* Dumb memory allocator (used for initializing paging).
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
  * @param physical      Physical base address of the allocated memory (buffer).
  * @return              Pointer to allocated memory.
  */
-void *kmalloc(size_t size, int align, physaddr_t *physical);
+void *dumb_kmalloc(size_t size, int align, physaddr_t *physical);
 
-/* Memory allocator and initializator.
+/* Dumb memory allocator and initializator (used for initializing paging).
  * @param size          Size of the memory chunk needed.
  * @param align         Pages should be aligned (4K)?
  * @param physical      Physical base address of the allocated memory (buffer).
  * @return              Pointer to allocated memory.
  */
-void *kcalloc(size_t size, int align, physaddr_t *physical);
+void *dumb_kcalloc(size_t size, int align, physaddr_t *physical);
 
 #endif
