@@ -5,11 +5,12 @@
 #include "mem.h"
 
 /* Copy a portion of memory from a source to a destination.
- * @param src           Source address.
- * @param dst           Destination address.
+ * @param source        Source address.
+ * @param destination   Destination address.
  * @param nbytes        Number of bytes to copy.
  */
-void memcpy(uint8_t *src, uint8_t *dst, int nbytes) {
+void memcpy(void *source, void *destination, int nbytes) {
+    uint8_t *src = (uint8_t *)source, *dst = (uint8_t *)destination;
     int i;
     for (i = 0; i < nbytes; ++i) {
         *(dst + i) = *(src + i);
@@ -17,11 +18,11 @@ void memcpy(uint8_t *src, uint8_t *dst, int nbytes) {
 }
 
 /* Set a certain portion of memory to a value.
- * @param dst           Base memory address.
+ * @param destination   Base memory address.
  * @param val           Value to set.
  * @param len           Length of memory portion (in bytes).
  */
-void memset(uint8_t *dst, uint8_t val, size_t len) {
-    uint8_t *temp = (uint8_t *)dst;
+void memset(void *destination, uint8_t val, size_t len) {
+    uint8_t *temp = (uint8_t *)destination;
     for (; len != 0; --len) *temp++ = val;
 }

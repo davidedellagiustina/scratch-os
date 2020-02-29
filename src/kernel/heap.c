@@ -48,6 +48,6 @@ void *dumb_kmalloc(size_t size, int align, physaddr_t *physical) {
  */
 void *dumb_kcalloc(size_t size, int align, physaddr_t *physical) {
     void *ptr = dumb_kmalloc(size, align, physical); // Allocate memory
-    memset((uint8_t *)ptr, 0, size); // Initialize to zero
+    memset(ptr, 0, size); // Initialize to zero
     return ptr;
 }
