@@ -46,7 +46,7 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     physaddr_t phys;
     kernel_directory = (page_directory_t *)dumb_kcalloc(sizeof(page_directory_t), 1, &phys); // Allocate space for page directory;
     kernel_directory->physical_addr = phys;
-    // Map kernel addresses + kernel dumb heap + video memory
+    // Map boot + GDT + kernel + kernel dumb heap + video memory
     physaddr_t physaddr = 0x0;
     void *virtaddr = (void *)(physaddr + 0xc0000000);
     while (physaddr < 0xc0000) {

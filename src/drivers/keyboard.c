@@ -23,9 +23,9 @@ const char layout[] = "italian";
 const char keys[] = { '?' /* Error */, '?' /* Esc */, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '+', '?' /* Backspace */, '\t' /* Tab */, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
     '\'', (char)141 /* ì */, '?' /* Enter */, '?' /* LCtrl */, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', (char)138 /* è */, (char)133 /* à */, (char)149 /* ò */, '?' /* LShift */, '\\', 'z', 'x', 'c',
     'v', 'b', 'n', 'm', ',', '.', (char)151 /* ù */, '?' /* RShift */, '?' /* Keypad * */, '?' /* LAlt */, ' ' /* Space */ };
-const char keys_shift[] = { '?' /* Error */, '?' /* Esc */, '!', '"', (char)156 /* £ */, '$', '%', '&', '/', '(', ')', '=', '_', '*', '?' /* Backspace */, '\t' /* Tab */, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O',
-    'P', '?' /* ? */, '^', '?' /* Enter */, '?' /* LCtrl */, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', (char)130 /* é */, (char)167 /* ° */, (char)135 /* ç */, '?' /* LShift */, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':',
-    (char)245 /* § */, '?' /* RShift */, '?' /* Keypad * */, '?' /* LAlt */, ' ' /* Space */ };
+const char keys_shift[] = { '?' /* Error */, '?' /* Esc */, '!', '"', (char)156 /* £ */, '$', '%', '&', '/', '(', ')', '=', '_', '*', '?' /* Backspace */, '\t' /* Tab */, 'Q', 'W', 'E', 'R', 'T', 'Y',
+    'U', 'I', 'O', 'P', '?' /* ? */, '^', '?' /* Enter */, '?' /* LCtrl */, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', (char)130 /* é */, (char)167 /* ° */, (char)135 /* ç */, '?' /* LShift */, '|',
+    'Z', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', (char)245 /* § */, '?' /* RShift */, '?' /* Keypad * */, '?' /* LAlt */, ' ' /* Space */ };
 
 /* Handler for the keyboard interrupts.
  * @param r             CPU state (registers).
