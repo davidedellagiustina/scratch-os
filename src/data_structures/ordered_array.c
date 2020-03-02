@@ -20,7 +20,7 @@ int8_t standard_lessthan_predicate(void *a, void *b) {
  */
 ordered_array_t create_ordered_array(uint32_t max_size, lessthan_predicate_t less_than) {
     ordered_array_t a;
-    a.array = (void *)kcalloc(max_size * sizeof(void *));
+    // a.array = (void *)kcalloc(max_size * sizeof(void *));
     a.size = 0; // No elements yet
     a.max_size = max_size;
     a.less_than = less_than;
@@ -33,7 +33,7 @@ ordered_array_t create_ordered_array(uint32_t max_size, lessthan_predicate_t les
  * @param less_than Less-than predicate to be used.
  */
 ordered_array_t place_ordered_array(void *addr, uint32_t max_size, lessthan_predicate_t less_than) {
-    ardered_array_t a;
+    ordered_array_t a;
     a.array = (void *)addr;
     memset(a.array, 0, max_size * sizeof(void *));
     a.size = 0;
@@ -46,7 +46,8 @@ ordered_array_t place_ordered_array(void *addr, uint32_t max_size, lessthan_pred
  * @param array     Ordered array to be destroyed.
  */
 void destroy_ordered_array(ordered_array_t *array) {
-    kfree(array->array);
+    // kfree(array->array);
+    (void)array;
 }
 
 /* Insert an element in an ordered array.
@@ -54,8 +55,8 @@ void destroy_ordered_array(ordered_array_t *array) {
  * @param item      New item to insert.
  */
 void insert_ordered_array(ordered_array_t *array, void *item) {
-    ASSERT(array->less_than); // There must be a predicate
-    ASSERT(array->size < array->max_size); // There must be space for inserting a new element
+    assert((int)array->less_than); // There must be a predicate
+    assert(array->size < array->max_size); // There must be space for inserting a new element
     uint32_t iterator = 0;
     while (iterator < array->size && array->less_than(array->array[iterator], item)) ++iterator; // Reach inserting position
     if (iterator == array->size) { // If end of array reached
@@ -79,7 +80,7 @@ void insert_ordered_array(ordered_array_t *array, void *item) {
  * @return          Element at position #i.
  */
 void *get_ordered_array(ordered_array_t *array, uint32_t i) {
-    ASSERT(i < array->size);
+    assert(i < array->size);
     return array->array[i];
 }
 
@@ -88,7 +89,7 @@ void *get_ordered_array(ordered_array_t *array, uint32_t i) {
  * @param i         Index of the element to be remove.
  */
 void remove_ordered_array(ordered_array_t *array, uint32_t i) {
-    ASSERT(i < array->size);
+    assert(i < array->size);
     while (i < array->size) {
         array->array[i] = array->array[i+1];
         ++i;

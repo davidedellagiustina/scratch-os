@@ -5,6 +5,9 @@
 #ifndef ORDERED_ARRAY_H
 #define ORDERED_ARRAY_H
 
+#include <stdint.h>
+#include "../libc/assert.h"
+
 // A less-than predicate should return nonzero if the first argument is less than the second, else it should return zero.
 typedef int8_t (*lessthan_predicate_t)(void *, void *);
 

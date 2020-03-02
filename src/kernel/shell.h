@@ -3,6 +3,7 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include <stdint.h>
 #include "../drivers/vga.h"
 #include "../libc/mem.h"
 #include "../libc/string.h"

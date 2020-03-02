@@ -5,6 +5,7 @@
 #ifndef PANIC_H
 #define PANIC_H
 
+#include <stdint.h>
 #include "../drivers/vga.h"
 
 /* Panic and halt the CPU with an error message.

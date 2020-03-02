@@ -5,6 +5,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+#include <stdint.h>
 #include "../libc/mem.h"
 
 /* Set the kernel data segment limit to a certain address.

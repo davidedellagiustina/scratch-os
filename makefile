@@ -3,8 +3,8 @@
 # @date		14/11/2019
 
 ASM_LIBS = $(wildcard src/boot/lib/16bit/*.asm src/boot/lib/32bit/*.asm)
-C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c)
-C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h src/libc/*.h)
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c src/data_structures/*.c)
+C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h src/libc/*.h src/data_structures/*.h)
 OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
 
 KERNEL_SIZE = $$(wc -c < 'src/kernel/kernel.bin') # Compute kernel size (in bytes)

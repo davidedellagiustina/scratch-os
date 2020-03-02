@@ -5,7 +5,7 @@
 ENTRY(kernel_entry) /* Kernel entry label */
 
 SECTIONS {
-    . = 0xc0004000; /* Kernel code is relocated at 3GB + 0x3500 */
+    . = 0xc0008000; /* Kernel code is relocated at 3GB + 0x8000 */
 
     kernel_virtual_start = .; /* Export labels */
     kernel_physical_start = . - 0xc0000000;

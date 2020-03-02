@@ -5,6 +5,7 @@
 #ifndef PAGING_H
 #define PAGING_H
 
+#include <stdint.h>
 #include "../drivers/vga.h"
 #include "../kernel/heap.h"
 #include "../libc/mem.h"

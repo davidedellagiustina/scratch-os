@@ -12,5 +12,7 @@ src/kernel/*.bin
 
 src/libc/*.o
 
+src/data_structures/*.o
+
 out/os-image.bin
 out/floppy.img
