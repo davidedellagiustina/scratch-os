@@ -106,7 +106,12 @@ void *kmalloc(uint32_t size);
  */
 void *kcalloc(uint32_t size);
 
-// void *krealloc(uint32_t size);
+/* Expand a previously allocated area to a new size.
+ * @param p                 Pointer to already allocated area.
+ * @param size              New size.
+ * @return                  Pointer to the enlarged area.
+ */
+void *krealloc(void *p, uint32_t size);
 
 /* Free some space in the kernel heap.
  * @param p                 Pointer to allocated space.

@@ -321,6 +321,20 @@ void *kcalloc(uint32_t size) {
     return allocated;
 }
 
+/* Expand a previously allocated area to a new size.
+ * @param p                 Pointer to already allocated area.
+ * @param size              New size.
+ * @return                  Pointer to the enlarged area.
+ */
+void *krealloc(void *p, uint32_t size) {
+    heap_header_t *header = (heap_header_t *)((uint32_t)p - sizeof(heap_header_t));
+    uint32_t old_size = header->size - sizeof(heap_header_t) - sizeof(heap_footer_t);
+    void *allocated = alloc(kernel_heap, size, 0);
+    memcpy(p, allocated, old_size);
+    kfree(p);
+    return allocated;
+}
+
 /* Free some space in the kernel heap.
  * @param p                 Pointer to allocated space.
  */
