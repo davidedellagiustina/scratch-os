@@ -6,6 +6,7 @@
 #include "../cpu/isr.h"
 #include "../cpu/paging.h"
 #include "../drivers/vga.h"
+#include "heap.h"
 
 /* Print "ScratchOS" ASCII art.
  */
@@ -39,12 +40,10 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     kprint("Setting up paging...");
     setup_paging(kvs, kve, kps, kpe);
     kprint(" Done!\n");
+    // Setup kernel heap
+    kheap_init();
     // TEMP: Basic shell-like interface here
     clear_screen();
     print_ascii_art();
     kprint("\n\n> ");
-    // TEMP: Test page faults
-    // uint32_t *ptr = (uint32_t *)0xa0000000;
-    // uint32_t do_page_fault = *ptr;
-    // (void)(do_page_fault); // Unused variable, just for test
 }

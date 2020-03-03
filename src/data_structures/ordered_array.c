@@ -50,12 +50,17 @@ void destroy_ordered_array(ordered_array_t *array) {
     (void)array;
 }
 
+#include "../drivers/vga.h"
+#include "../libc/string.h"
+
 /* Insert an element in an ordered array.
  * @param array     Ordered array.
  * @param item      New item to insert.
  */
 void insert_ordered_array(ordered_array_t *array, void *item) {
-    assert((int)array->less_than); // There must be a predicate
+    char b[20];
+    itoa(array->size, b, 10);
+    kprint("Size: "); kprint(b); kprint("\n");
     assert(array->size < array->max_size); // There must be space for inserting a new element
     uint32_t iterator = 0;
     while (iterator < array->size && array->less_than(array->array[iterator], item)) ++iterator; // Reach inserting position
