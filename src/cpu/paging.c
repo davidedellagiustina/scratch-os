@@ -79,7 +79,7 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
         physaddr += 0x1000; virtaddr += 0x1000; // Increment pointers
     }
     // Reset brk for kheap
-    kbrk((void *)0xc00c0000);
+    kbrk((void *)0xc0100000);
     // Load new page directory
     switch_page_directory(kernel_directory);
     (void)kvs; (void)kps; // Unused parameters

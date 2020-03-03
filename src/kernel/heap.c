@@ -4,7 +4,7 @@
 
 #include "heap.h"
 
-void *kernel_brk = (void *)0xc00c0000; // Virtual, aligned, after end of VGA memory (0xa0000 - 0xc0000)
+void *kernel_brk = (void *)0xc0100000; // Virtual, aligned, after end of VGA/ROM memory (0xa0000 - 0xfffff)
 heap_t *kernel_heap; // Kernel heap
 
 /* Set the kernel data segment limit to a certain address.
@@ -98,7 +98,7 @@ static int8_t heap_header_t_less_than(void *a, void *b) {
 heap_t *create_heap(void *start, void *end, void *max, uint8_t supervisor, uint8_t readonly) {
     kbrk((void *)0xc0050000);
     heap_t *heap = (heap_t *)dumb_kmalloc(sizeof(heap_t), 0, 0); // Heap struct at address 0xc00c0000 + index size
-    kbrk((void *)0xc00c0000);
+    kbrk((void *)0xc0100000);
     assert((uint32_t)start % 0x1000 == 0); // Must be page-aligned
     assert((uint32_t)end % 0x1000 == 0);
     heap->index = place_ordered_array(start, KHEAP_INDEX_SIZE, &heap_header_t_less_than); // Initialize index of holes
@@ -120,6 +120,9 @@ heap_t *create_heap(void *start, void *end, void *max, uint8_t supervisor, uint8
     hole->size = end - start;
     hole->magic = HEAP_MAGIC;
     hole->is_hole = 1;
+    heap_footer_t *hole_footer = (heap_footer_t *)((uint32_t)hole + hole->size - sizeof(heap_footer_t));
+    hole_footer->magic = HEAP_MAGIC;
+    hole_footer->header = hole;
     insert_ordered_array(&heap->index, (void *)hole);
     return heap; // Return heap structure
 }
@@ -144,7 +147,7 @@ static void expand(heap_t *heap, uint32_t new_size) {
  * @return              New size of the heap (page-aligned);
  */
 static uint32_t contract(heap_t *heap, uint32_t new_size) {
-    assert(new_size > (uint32_t)(heap->end_addr - heap->start_addr));
+    assert(new_size < (uint32_t)(heap->end_addr - heap->start_addr));
     if (new_size & 0xfff) {
         new_size &= 0xfffff000;
         new_size += 0x1000;

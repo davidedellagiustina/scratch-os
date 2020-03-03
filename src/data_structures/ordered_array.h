@@ -8,11 +8,13 @@
 #include <stdint.h>
 #include "../libc/assert.h"
 
+typedef void* type_t; // Generic type
+
 // A less-than predicate should return nonzero if the first argument is less than the second, else it should return zero.
-typedef int8_t (*lessthan_predicate_t)(void *, void *);
+typedef int8_t (*lessthan_predicate_t)(type_t, type_t);
 
 typedef struct {
-    void **array;
+    type_t *array;
     uint32_t size;
     uint32_t max_size;
     lessthan_predicate_t less_than;
@@ -23,7 +25,7 @@ typedef struct {
  * @param b         Second element to compare.
  * @return          Zero if a >= b, nonzero otherwise.
  */
-int8_t standard_lessthan_predicate(void *a, void *b);
+int8_t standard_lessthan_predicate(type_t a, type_t b);
 
 /* Create a new ordered array and place it in memory using kmalloc().
  * @param max_size  Maximum size of the array.
@@ -48,14 +50,14 @@ void destroy_ordered_array(ordered_array_t *array);
  * @param array     Ordered array.
  * @param item      New item to insert.
  */
-void insert_ordered_array(ordered_array_t *array, void *item);
+void insert_ordered_array(ordered_array_t *array, type_t item);
 
 /* Get the element at a certain position in an ordered array.
  * @param array     Ordered array.
  * @param i         Index to look up.
  * @return          Element at position #i.
  */
-void *get_ordered_array(ordered_array_t *array, uint32_t i);
+type_t get_ordered_array(ordered_array_t *array, uint32_t i);
 
 /* Remove an element from an ordered array.
  * @param array     Ordered array.
