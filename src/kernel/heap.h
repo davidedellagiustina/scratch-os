@@ -100,7 +100,11 @@ void kheap_init();
  */
 void *kmalloc(uint32_t size);
 
-// void *kcalloc(uint32_t size);
+/* Allocate space in the kernel heap, then initialize it to 0.
+ * @param size              Size of requested space.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kcalloc(uint32_t size);
 
 // void *krealloc(uint32_t size);
 

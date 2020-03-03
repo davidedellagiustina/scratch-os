@@ -311,6 +311,16 @@ void *kmalloc(uint32_t size) {
     return alloc(kernel_heap, size, 0);
 }
 
+/* Allocate space in the kernel heap, then initialize it to 0.
+ * @param size              Size of requested space.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kcalloc(uint32_t size) {
+    void *allocated = alloc(kernel_heap, size, 0);
+    memset(allocated, 0, size);
+    return allocated;
+}
+
 /* Free some space in the kernel heap.
  * @param p                 Pointer to allocated space.
  */
