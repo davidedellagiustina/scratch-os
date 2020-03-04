@@ -81,7 +81,7 @@ static int32_t find_smallest_hole(heap_t *heap, uint32_t size, uint8_t page_alig
 /* Comparing function for ordering heap blocks (increasing size).
  * @param a             First block to compare.
  * @param b             Second block to compare.
- * @return              1 if a < b, 0 otehrwise.
+ * @return              1 if a < b, 0 otherwise.
  */
 static int8_t heap_header_t_less_than(void *a, void *b) {
     return ((((heap_header_t *)a)->size < ((heap_header_t *)b)->size)? 1 : 0);
@@ -92,7 +92,7 @@ static int8_t heap_header_t_less_than(void *a, void *b) {
  * @param end           End of the allocated memory for the heap.
  * @param max           Maximum address the heap can reach.
  * @param supervisor    The requested pages will be in kernel (supervisor) mode?
- * @param readonly      The requested pges will be read-only?
+ * @param readonly      The requested pages will be read-only?
  * @return              Pointer to the heap structure.
  */
 heap_t *create_heap(void *start, void *end, void *max, uint8_t supervisor, uint8_t readonly) {
