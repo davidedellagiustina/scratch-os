@@ -100,11 +100,25 @@ void kheap_init();
  */
 void *kmalloc(uint32_t size);
 
+/* Allocate space in the kernel heap.
+ * @param size              Size of requested space.
+ * @param phys              Where physical address will be stored.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kmalloc_ap(uint32_t size, physaddr_t *phys);
+
 /* Allocate space in the kernel heap, then initialize it to 0.
  * @param size              Size of requested space.
  * @return                  Pointer to newly allocated area.
  */
 void *kcalloc(uint32_t size);
+
+/* Allocate space in the kernel heap, then initialize it to 0.
+ * @param size              Size of requested space.
+ * @param phys              Where physical address will be stored.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kcalloc_ap(uint32_t size, physaddr_t *phys);
 
 /* Expand a previously allocated area to a new size.
  * @param p                 Pointer to already allocated area.

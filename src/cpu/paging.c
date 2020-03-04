@@ -119,6 +119,57 @@ void page_fault_handler(registers_t *r) {
     // NEEDED: disk driver!
 }
 
+/* Clone a page directory and the requires (only non-kernel ones) tables.
+ * @param src           Source page directory.
+ * @return              Pointer to the new page directory.
+ */
+page_directory_t *clone_page_directory(page_directory_t *src) {
+    physaddr_t phys;
+    page_directory_t *dst = (page_directory_t *)kcalloc_ap(sizeof(page_directory_t), &phys);
+    dst->physical_addr = phys;
+    uint32_t i;
+    for (i = 0; i < 1024; ++i) { // For each page table
+        if (!src->tables[i]) continue; // If it is empty, skip it
+        if (kernel_directory->tables[i] == src->tables[i]) { // If it is the same as kernel dir, it should be linked
+            dst->tables[i] = src->tables[i];
+            dst->tables_physical[i] = src->tables_physical[i];
+        } else { // Else, page table should be copied
+            dst->tables[i] = clone_page_table(src->tables[i], &phys);
+            dst->tables_physical[i] = phys | 0x7; // User-mode, r/w, present
+        }
+    }
+    return dst;
+}
+
+/* Clone a page table.
+ * @param src               Page table to clone.
+ * @param phys              Pointer where to store new page table physical address.
+ * @return                  Pointer to the new page table.
+ */
+page_table_t *clone_page_table(page_table_t *src, physaddr_t *phys) {
+    page_table_t *dst = (page_table_t *)kcalloc_ap(sizeof(page_table_t), phys);
+    uint32_t i = 0;
+    for (i = 0; i < 1024; ++i) { // For each entry of the page table
+        if (!src->pages[i].frame_addr) continue; // Skip empty pages
+        alloc_frame(&dst->pages[i], 0, 1);
+        if (src->pages[i].present) dst->pages[i].present = 1;
+        if (src->pages[i].rw) dst->pages[i].rw = 1;
+        if (src->pages[i].user) dst->pages[i].user = 1;
+        if (src->pages[i].accessed) dst->pages[i].accessed = 1;
+        if (src->pages[i].dirty) dst->pages[i].dirty = 1;
+        copy_frame(src->pages[i].frame_addr*0x1000, dst->pages[i].frame_addr*0x1000);
+    }
+    return dst;
+}
+
+/* Copy a page frame.
+ * @param src               Source frame.
+ * @param dst               Destination frame.
+ */
+void copy_frame(physaddr_t src, physaddr_t dst) {
+    // TODO
+}
+
 // Private functions
 
 /* Create a new page table in a spacific page directory.

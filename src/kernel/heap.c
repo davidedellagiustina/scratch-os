@@ -311,6 +311,17 @@ void *kmalloc(uint32_t size) {
     return alloc(kernel_heap, size, 0);
 }
 
+/* Allocate space in the kernel heap.
+ * @param size              Size of requested space.
+ * @param phys              Where physical address will be stored.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kmalloc_ap(uint32_t size, physaddr_t *phys) {
+    void *allocated = alloc(kernel_heap, size, 1);
+    *phys = (physaddr_t)allocated - 0xc0000000;
+    return allocated;
+}
+
 /* Allocate space in the kernel heap, then initialize it to 0.
  * @param size              Size of requested space.
  * @return                  Pointer to newly allocated area.
@@ -318,6 +329,18 @@ void *kmalloc(uint32_t size) {
 void *kcalloc(uint32_t size) {
     void *allocated = alloc(kernel_heap, size, 0);
     memset(allocated, 0, size);
+    return allocated;
+}
+
+/* Allocate space in the kernel heap, then initialize it to 0.
+ * @param size              Size of requested space.
+ * @param phys              Where physical address will be stored.
+ * @return                  Pointer to newly allocated area.
+ */
+void *kcalloc_ap(uint32_t size, physaddr_t *phys) {
+    void *allocated = alloc(kernel_heap, size, 1);
+    memset(allocated, 0, size);
+    *phys = (physaddr_t)allocated - 0xc0000000;
     return allocated;
 }
 

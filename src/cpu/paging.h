@@ -56,4 +56,23 @@ void switch_page_directory(page_directory_t *page_directory);
  */
 void page_fault_handler(registers_t *r);
 
+/* Clone a page directory and the requires (only non-kernel ones) tables.
+ * @param src           Source page directory.
+ * @return              Pointer to the new page directory.
+ */
+page_directory_t *clone_page_directory(page_directory_t *src);
+
+/* Clone a page table.
+ * @param src               Page table to clone.
+ * @param phys              Pointer where to store new page table physical address.
+ * @return                  Pointer to the new page table.
+ */
+page_table_t *clone_page_table(page_table_t *src, physaddr_t *phys);
+
+/* Copy a page frame.
+ * @param src               Source frame.
+ * @param dst               Destination frame.
+ */
+void copy_frame(physaddr_t src, physaddr_t dst);
+
 #endif
