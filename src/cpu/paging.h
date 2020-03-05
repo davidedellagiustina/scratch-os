@@ -46,6 +46,10 @@ typedef struct {
  */
 void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe);
 
+/* Load the main page directory, after kernel heap has been initialized.
+ */
+void fix_paging();
+
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
@@ -61,18 +65,5 @@ void page_fault_handler(registers_t *r);
  * @return              Pointer to the new page directory.
  */
 page_directory_t *clone_page_directory(page_directory_t *src);
-
-/* Clone a page table.
- * @param src               Page table to clone.
- * @param phys              Pointer where to store new page table physical address.
- * @return                  Pointer to the new page table.
- */
-page_table_t *clone_page_table(page_table_t *src, physaddr_t *phys);
-
-/* Copy a page frame.
- * @param src               Source frame.
- * @param dst               Destination frame.
- */
-void copy_frame(physaddr_t src, physaddr_t dst);
 
 #endif

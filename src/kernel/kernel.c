@@ -41,7 +41,13 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     setup_paging(kvs, kve, kps, kpe);
     kprint(" Done!\n");
     // Setup kernel heap
+    kprint("Setting up kernel heap...");
     kheap_init();
+    kprint(" Done!\n");
+    // Switch page_directory
+    kprint("Switching page directory...");
+    fix_paging();
+    kprint(" Done!\n");
     // TEMP: Basic shell-like interface here
     clear_screen();
     print_ascii_art();

@@ -157,6 +157,8 @@ static uint32_t contract(heap_t *heap, uint32_t new_size) {
     return new_size;
 }
 
+#include "../drivers/vga.h"
+
 /* Allocate a new block in the heap.
  * @param heap          Heap.
  * @param size          Size of the needed block.
@@ -209,7 +211,7 @@ void *alloc(heap_t *heap, uint32_t size, uint8_t page_align) {
         new_size = orig_hole_size;
     }
     // Check page alignment
-    if (page_align && (orig_hole_pos & 0xfff)) {
+    if (page_align && ((orig_hole_pos + sizeof(heap_header_t)) & 0xfff)) {
         uint32_t new_location = orig_hole_pos + 0x1000 - (orig_hole_pos & 0xfff) - sizeof(heap_header_t);
         heap_header_t *hole_header = (heap_header_t *)orig_hole_pos;
         hole_header->size = 0x1000 - (orig_hole_pos & 0xfff) - sizeof(heap_header_t);

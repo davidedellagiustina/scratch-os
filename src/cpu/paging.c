@@ -63,8 +63,8 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
         set_frame(physaddr);
         physaddr += 0x1000; virtaddr += 0x1000; // Increment pointers
     }
-    // Map some space for future kernel heap (63.25MB) -> Kernel heap limit is 64MB (0x4000000)
-    while (physaddr < 0x4000000) {
+    // Map some space for future kernel heap (63.25MB) -> Kernel heap limit is 64MB (0x4000000) [edit: removed last page frame, which is now used for temp mapping for fork()]
+    while (physaddr < 0x3fff000) {
         uint32_t pti = (uint32_t)virtaddr >> 22; // Page table index
         uint32_t pi = ((uint32_t)virtaddr >> 12) & 0x3ff; // Page index
         if (!kernel_directory->tables[pti]) {
@@ -83,6 +83,13 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     // Load new page directory
     switch_page_directory(kernel_directory);
     (void)kvs; (void)kps; // Unused parameters
+}
+
+/* Load the main page directory, after kernel heap has been initialized.
+ */
+void fix_paging() {
+    page_directory_t *dir = clone_page_directory(kernel_directory);
+    switch_page_directory(dir);
 }
 
 /* Load a new page directory into the CR3 register.
@@ -125,49 +132,54 @@ void page_fault_handler(registers_t *r) {
  */
 page_directory_t *clone_page_directory(page_directory_t *src) {
     physaddr_t phys;
-    page_directory_t *dst = (page_directory_t *)kcalloc_ap(sizeof(page_directory_t), &phys);
-    dst->physical_addr = phys;
+    page_directory_t *dir = (page_directory_t *)kcalloc_ap(sizeof(page_directory_t), &phys);
+    dir->physical_addr = phys;
     uint32_t i;
     for (i = 0; i < 1024; ++i) { // For each page table
         if (!src->tables[i]) continue; // If it is empty, skip it
         if (kernel_directory->tables[i] == src->tables[i]) { // If it is the same as kernel dir, it should be linked
-            dst->tables[i] = src->tables[i];
-            dst->tables_physical[i] = src->tables_physical[i];
+            dir->tables[i] = src->tables[i];
+            dir->tables_physical[i] = src->tables_physical[i];
         } else { // Else, page table should be copied
-            dst->tables[i] = clone_page_table(src->tables[i], &phys);
-            dst->tables_physical[i] = phys | 0x7; // User-mode, r/w, present
+            // Allocate page table
+            page_table_t *tbl = (page_table_t *)kcalloc_ap(sizeof(page_table_t), &phys);
+            // Save reference
+            dir->tables[i] = tbl;
+            // dir->tables_physical[i] = phys | 0x7; // User-mode, r/w, present
+            dir->tables_physical[i] = phys | 0x3; // User-mode, r/w, present
+            // Copy page table
+            uint32_t j;
+            for (j = 0; j < 1024; ++j) { // For each entry of the page tbale
+                if (!src->tables[i]->pages[j].frame_addr) continue; // Skip empty pages
+                alloc_frame(&tbl->pages[j], 0, 1); // Allocate a new frame, user, writable
+                if (src->tables[i]->pages[j].present) tbl->pages[j].present = 1;
+                if (src->tables[i]->pages[j].rw) tbl->pages[j].rw = 1;
+                if (src->tables[i]->pages[j].user) tbl->pages[j].user = 1;
+                if (src->tables[i]->pages[j].accessed) tbl->pages[j].accessed = 1;
+                if (src->tables[i]->pages[j].dirty) tbl->pages[j].dirty = 1;
+                // Temporarily map frame (in kernel virtual space, virtual addr 0xc3fff000) in order to copy it
+                src->tables[0x30f]->pages[0x3ff].frame_addr = src->tables[i]->pages[j].frame_addr;
+                src->tables[0x30f]->pages[0x3ff].present = 1;
+                src->tables[0x30f]->pages[0x3ff].rw = 1;
+                src->tables[0x30f]->pages[0x3ff].user = 1;
+                src->tables[0x30f]->pages[0x3ff].accessed = 0;
+                src->tables[0x30f]->pages[0x3ff].dirty = 0;
+                asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+                // Copy physical frame
+                uint32_t addr = (i << 22) | (j << 12);
+                memcpy((void *)addr, (void *)0xc3fff000, 0x1000);
+                // Remove temporary mapping and invalidate TLB
+                src->tables[0x30f]->pages[0x3ff].frame_addr = 0;
+                src->tables[0x30f]->pages[0x3ff].present = 0;
+                src->tables[0x30f]->pages[0x3ff].rw = 0;
+                src->tables[0x30f]->pages[0x3ff].user = 0;
+                src->tables[0x30f]->pages[0x3ff].accessed = 0;
+                src->tables[0x30f]->pages[0x3ff].dirty = 0;
+                asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+            }
         }
     }
-    return dst;
-}
-
-/* Clone a page table.
- * @param src               Page table to clone.
- * @param phys              Pointer where to store new page table physical address.
- * @return                  Pointer to the new page table.
- */
-page_table_t *clone_page_table(page_table_t *src, physaddr_t *phys) {
-    page_table_t *dst = (page_table_t *)kcalloc_ap(sizeof(page_table_t), phys);
-    uint32_t i = 0;
-    for (i = 0; i < 1024; ++i) { // For each entry of the page table
-        if (!src->pages[i].frame_addr) continue; // Skip empty pages
-        alloc_frame(&dst->pages[i], 0, 1);
-        if (src->pages[i].present) dst->pages[i].present = 1;
-        if (src->pages[i].rw) dst->pages[i].rw = 1;
-        if (src->pages[i].user) dst->pages[i].user = 1;
-        if (src->pages[i].accessed) dst->pages[i].accessed = 1;
-        if (src->pages[i].dirty) dst->pages[i].dirty = 1;
-        copy_frame(src->pages[i].frame_addr*0x1000, dst->pages[i].frame_addr*0x1000);
-    }
-    return dst;
-}
-
-/* Copy a page frame.
- * @param src               Source frame.
- * @param dst               Destination frame.
- */
-void copy_frame(physaddr_t src, physaddr_t dst) {
-    // TODO
+    return dir;
 }
 
 // Private functions
