@@ -145,8 +145,7 @@ page_directory_t *clone_page_directory(page_directory_t *src) {
             page_table_t *tbl = (page_table_t *)kcalloc_ap(sizeof(page_table_t), &phys);
             // Save reference
             dir->tables[i] = tbl;
-            // dir->tables_physical[i] = phys | 0x7; // User-mode, r/w, present
-            dir->tables_physical[i] = phys | 0x3; // User-mode, r/w, present
+            dir->tables_physical[i] = phys | 0x7; // User-mode, r/w, present
             // Copy page table
             uint32_t j;
             for (j = 0; j < 1024; ++j) { // For each entry of the page tbale
