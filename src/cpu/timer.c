@@ -6,11 +6,14 @@
 
 uint32_t tick = 0;
 
+extern void context_switch();
+
 /* Handler for the timer interrupts.
  * @param r             CPU state (registers).
  */
 static void timer_callback(registers_t *r) {
     ++tick;
+    context_switch(); // Schedule a new process
     (void)(r); // Unused parameter
 }
 

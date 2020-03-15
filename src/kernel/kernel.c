@@ -7,6 +7,7 @@
 #include "../cpu/paging.h"
 #include "../drivers/vga.h"
 #include "heap.h"
+#include "processes.h"
 
 /* Print "ScratchOS" ASCII art.
  */
@@ -44,10 +45,21 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     kprint("Setting up kernel heap...");
     kheap_init();
     kprint(" Done!\n");
-    // Switch page_directory
-    kprint("Switching page directory...");
-    fix_paging();
+    // Setup scheduling queue
+    kprint("Setting up scheduling queue and structures...");
+    processes_init();
     kprint(" Done!\n");
+    // Launch init process
+    // kprint("Launching the init process...");
+    // launch_init(); // Activate scheduler (init will be started)
+
+    // Shutdown code
+    // clear_screen();
+    // kprint("Shutting down the system...");
+    // outw(0x604, 0x2000); // QEMU specific instuction for shutdown
+    // outw(0xb004, 0x2000); // QEMU (<2.0), Bochs
+    // outw(0x4004, 0x3400); // Virtualbox
+
     // TEMP: Basic shell-like interface here
     clear_screen();
     print_ascii_art();

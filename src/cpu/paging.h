@@ -46,10 +46,6 @@ typedef struct {
  */
 void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe);
 
-/* Load the main page directory, after kernel heap has been initialized.
- */
-void fix_paging();
-
 /* Load a new page directory into the CR3 register.
  * @param page_directory        Address of the new page directory to load.
  */
