@@ -3,7 +3,7 @@
 # @date		14/11/2019
 
 ASM_LIBS = $(wildcard src/boot/lib/16bit/*.asm src/boot/lib/32bit/*.asm)
-C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c src/data_structures/*.c)
+C_SOURCES = $(wildcard src/kernel/*.c src/drivers/*.c src/cpu/*.c src/libc/*.c src/data_structures/*.c src/programs/*.c)
 C_HEADERS = $(wildcard src/kernel/*.h src/drivers/*.h src/cpu/*.h src/libc/*.h src/data_structures/*.h)
 OBJ = $(C_SOURCES:.c=.o src/cpu/interrupt.o) # Extension replacement
 
@@ -57,4 +57,5 @@ vbox: all
 
 clean:
 	rm -rf src/boot/*.o src/boot/*.bin src/kernel/*.o src/kernel/*.bin src/drivers/*.o src/cpu/*.o src/libc/*.o src/data_structures/*.o
+	rm -rf src/programs/*.o
 	rm -rf out/os-image.bin out/floppy.img

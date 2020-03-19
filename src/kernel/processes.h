@@ -6,7 +6,9 @@
 #define PROCESSES_H
 
 #include <stdint.h>
+#include "../cpu/isr.h"
 #include "../cpu/paging.h"
+#include "../libc/mem.h"
 #include "heap.h"
 
 // Represent a process control block
@@ -15,7 +17,7 @@ typedef struct {
     uint32_t esp, ebp; // Stack pointers
     uint32_t eip; // Instruction pointer
     page_directory_t *page_directory; // Address space (page directory)
-} process_t;
+} pcb_t;
 
 /* Initialize the structures needed for managing processes.
  */

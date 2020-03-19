@@ -13,6 +13,7 @@ KERNEL_STACK_SIZE equ 4*1024 ; In bytes
 [extern kmain]
 
 global kernel_entry
+global read_eip
 
 ; Higher-half kernel start
 ; Delete identity mapping, load labels and then call C code
@@ -38,6 +39,11 @@ kernel_entry:
     push kernel_virtual_start
     call kmain ; Call kmain
     jmp $ ; Control should never get back there, just for prevention
+
+; Read the instruction pointer
+read_eip:
+    pop eax
+    jmp eax
 
 section .bss
 align 4

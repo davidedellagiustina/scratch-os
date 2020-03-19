@@ -62,4 +62,29 @@ void page_fault_handler(registers_t *r);
  */
 page_directory_t *clone_page_directory(page_directory_t *src);
 
+/* Temporarily map frame (in kernel virtual space, virtual addr 0xc3fff000) in order to being able to write on it.
+ * @param addr              Physical address of the frame to map.
+ */
+void temp_map(physaddr_t addr);
+
+/* Demap frame previously temporarily mapped.
+ */
+void temp_demap();
+
+/* Create a new page table in a spacific page directory.
+ * @param page_directory        Page directory.
+ * @param index                 Page table index (i.e. PD entry number).
+ * @param is_kernel             Set if page table is kernel, clear if user.
+ * @param is_writable           Set if page table is writable, clear is read-only.
+ */
+void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t is_kernel, uint8_t is_writable);
+
+/* Allocate a new frame.
+ * @param page              Page to allocate in that frame.
+ * @param is_kernel         Page is kernel-mode?
+ * @param is_writable       Page is writable?
+ * @return                  Physical address of the allocated frame.
+ */
+physaddr_t alloc_frame(page_t *page, int is_kernel, int is_writable);
+
 #endif

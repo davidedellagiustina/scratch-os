@@ -50,8 +50,8 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     processes_init();
     kprint(" Done!\n");
     // Launch init process
-    // kprint("Launching the init process...");
-    // launch_init(); // Activate scheduler (init will be started)
+    kprint("Launching the init process...");
+    launch_init(); // Activate scheduler (init will be started)
 
     // Shutdown code
     // clear_screen();
@@ -61,7 +61,7 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     // outw(0x4004, 0x3400); // Virtualbox
 
     // TEMP: Basic shell-like interface here
-    clear_screen();
-    print_ascii_art();
-    kprint("\n\n> ");
+    // clear_screen();
+    // print_ascii_art();
+    // kprint("\n\n> ");
 }

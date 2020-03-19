@@ -19,9 +19,7 @@ static void set_frame(physaddr_t frame_address);
 static void clear_frame(physaddr_t frame_address);
 // static uint32_t test_frame(physaddr_t frame_address);
 static uint32_t first_free_frame();
-void alloc_frame(page_t *page, int is_kernel, int is_writable);
 void free_frame(page_t *page);
-void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t is_kernel, uint8_t is_writable);
 
 // Public functions
 
@@ -41,6 +39,12 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     uint32_t mem_size = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
     nframes = mem_size / 0x1000;
     frames = (uint32_t *)dumb_kcalloc(INDEX(nframes), 0, 0); // Allocate bitmap
+    // Frames until 0x40000 are reserved for kernel use
+    physaddr_t frame = 0x0;
+    while (frame < 0x40000) {
+        set_frame(frame);
+        frame += 0x1000;
+    }
     // Allocate page directory and tables before video memory
     kbrk(kve);
     physaddr_t phys;
@@ -150,31 +154,42 @@ page_directory_t *clone_page_directory(page_directory_t *src) {
                 if (src->tables[i]->pages[j].accessed) tbl->pages[j].accessed = 1;
                 if (src->tables[i]->pages[j].dirty) tbl->pages[j].dirty = 1;
                 // Temporarily map frame (in kernel virtual space, virtual addr 0xc3fff000) in order to copy it
-                src->tables[0x30f]->pages[0x3ff].frame_addr = src->tables[i]->pages[j].frame_addr;
-                src->tables[0x30f]->pages[0x3ff].present = 1;
-                src->tables[0x30f]->pages[0x3ff].rw = 1;
-                src->tables[0x30f]->pages[0x3ff].user = 1;
-                src->tables[0x30f]->pages[0x3ff].accessed = 0;
-                src->tables[0x30f]->pages[0x3ff].dirty = 0;
-                asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+                temp_map(src->tables[i]->pages[j].frame_addr);
                 // Copy physical frame
                 uint32_t addr = (i << 22) | (j << 12);
                 memcpy((void *)addr, (void *)0xc3fff000, 0x1000);
                 // Remove temporary mapping and invalidate TLB
-                src->tables[0x30f]->pages[0x3ff].frame_addr = 0;
-                src->tables[0x30f]->pages[0x3ff].present = 0;
-                src->tables[0x30f]->pages[0x3ff].rw = 0;
-                src->tables[0x30f]->pages[0x3ff].user = 0;
-                src->tables[0x30f]->pages[0x3ff].accessed = 0;
-                src->tables[0x30f]->pages[0x3ff].dirty = 0;
-                asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+                temp_demap();
             }
         }
     }
     return dir;
 }
 
-// Private functions
+/* Temporarily map frame (in kernel virtual space, virtual addr 0xc3fff000) in order to being able to write on it.
+ * @param addr              Physical address of the frame to map.
+ */
+void temp_map(physaddr_t addr) {
+    current_directory->tables[0x30f]->pages[0x3ff].frame_addr = addr;
+    current_directory->tables[0x30f]->pages[0x3ff].present = 1;
+    current_directory->tables[0x30f]->pages[0x3ff].rw = 1;
+    current_directory->tables[0x30f]->pages[0x3ff].user = 1;
+    current_directory->tables[0x30f]->pages[0x3ff].accessed = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].dirty = 0;
+    asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+}
+
+/* Demap frame previously temporarily mapped.
+ */
+void temp_demap() {
+    current_directory->tables[0x30f]->pages[0x3ff].frame_addr = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].present = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].rw = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].user = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].accessed = 0;
+    current_directory->tables[0x30f]->pages[0x3ff].dirty = 0;
+    asm volatile("invlpg (%0)" : : "r"(0xc3fff000) : "memory");
+}
 
 /* Create a new page table in a spacific page directory.
  * @param page_directory        Page directory.
@@ -191,6 +206,8 @@ void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t
     page_directory->tables_physical[index] = phys | perm;
     page_directory->tables_physical[0] = phys | perm;
 }
+
+// Private functions
 
 /* Set a bit in the frames bitset.
  * @param frame_address         Physical address of the frame.
@@ -243,21 +260,23 @@ static uint32_t first_free_frame() {
  * @param page              Page to allocate in that frame.
  * @param is_kernel         Page is kernel-mode?
  * @param is_writable       Page is writable?
+ * @return                  Physical address of the allocated frame.
  */
-void alloc_frame(page_t *page, int is_kernel, int is_writable) {
-    if (page->frame_addr != 0) return; // Already allocated frame
+physaddr_t alloc_frame(page_t *page, int is_kernel, int is_writable) {
+    if (page->frame_addr != 0) return (physaddr_t)-1; // Already allocated frame
     uint32_t index = first_free_frame();
     if (index == (uint32_t)-1) { // If there are no free frames
         panic("no free frames");
         // TODO: must implement frame replacement algorithm!
         // NEEDED: disk driver!
-        return;
+        return (physaddr_t)-1;
     }
     set_frame((physaddr_t)(index * 0x1000)); // Allocate frame
     page->present = 1;
     page->rw = ((is_writable)? 1 : 0);
     page->user = ((is_kernel)? 0 : 1);
     page->frame_addr = index;
+    return (physaddr_t)(index * 0x1000);
 }
 
 /* Free an existing frame.
