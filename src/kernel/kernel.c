@@ -19,6 +19,8 @@ void print_ascii_art() {
     kprint("|____/ \\___|_|  \\__,_|\\__\\___|_| |_|\\___/|____/");
 }
 
+extern page_directory_t *kernel_directory;
+
 /* Kernel main.
  * @param kvs       Kernel start virtual address.
  * @param kve       Kernel end virtual address.
@@ -30,7 +32,11 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     kprint("Booting ScratchOS v0.1...\n\n");
     // Print some kernel info
     uint32_t kernel_size = ((kpe - kps) / 1024) - 4; // In KB, subtracting the size of kernel stack
-    char buf[10]; itoa(kernel_size, buf, 10);
+    char buf[10]; itoa(kps, buf, 16);
+    kprint("Kernel location: 0x"); kprint(buf); kprint(" - ");
+    itoa(kpe, buf, 16);
+    kprint("0x"); kprint(buf); kprint(".\n");
+    itoa(kernel_size, buf, 10);
     kprint("Kernel approximate size: "); kprint(buf); kprint("KB.\n");
     // Install interrupt handlers
     kprint("Installing interrupt vector and handlers...");

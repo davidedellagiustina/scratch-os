@@ -38,7 +38,7 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     // Allocate frame bitmap
     uint32_t mem_size = TOTAL_RAM_SIZE * 0x100000; // RAM size (in MB) * 1MB (argument passed at compile time)
     nframes = mem_size / 0x1000;
-    frames = (uint32_t *)dumb_kcalloc(INDEX(nframes), 0, 0); // Allocate bitmap
+    frames = (uint32_t *)dumb_kcalloc(INDEX(nframes) * sizeof(uint32_t), 0, 0); // Allocate bitmap
     // Frames until 0x40000 are reserved for kernel use
     physaddr_t frame = 0x0;
     while (frame < 0x40000) {
@@ -82,6 +82,8 @@ void setup_paging(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
         set_frame(physaddr);
         physaddr += 0x1000; virtaddr += 0x1000; // Increment pointers
     }
+    // "Book" frame for performing a page directory clone
+    set_frame(0x3fff000);
     // Reset brk for kheap
     kbrk((void *)0xc0100000);
     // Load new page directory
@@ -204,7 +206,6 @@ void create_page_table(page_directory_t *page_directory, uint32_t index, uint8_t
     perm |= (is_writable? 1 : 0) << 1;
     perm |= (is_kernel? 0 : 1) << 2;
     page_directory->tables_physical[index] = phys | perm;
-    page_directory->tables_physical[0] = phys | perm;
 }
 
 // Private functions

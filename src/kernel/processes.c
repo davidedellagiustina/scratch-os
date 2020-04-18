@@ -39,7 +39,11 @@ void processes_init() {
     while (i < 0x8000) { // 32KiB for each process' text and data sections
         uint32_t pti = (uint32_t)i >> 22; // Page table index
         uint32_t pi = ((uint32_t)i >> 12) & 0x3ff; // Page index
-        if (!init->page_directory->tables[pti]) create_page_table(init->page_directory, pti, 0, 1); // User-mode page table
+        if (!init->page_directory->tables[pti]) { // If not already done, create page_table
+            physaddr_t phys;
+            init->page_directory->tables[pti] = (page_table_t *)kcalloc_ap(sizeof(page_table_t), &phys);
+            init->page_directory->tables_physical[pti] = phys | 0x7;
+        }
         physaddr_t addr = alloc_frame(&(init->page_directory->tables[pti]->pages[pi]), 0, 1);
         // Load init process code in memory, for each page it takes
         if (j < (uint32_t)p_init_end) {
@@ -56,7 +60,11 @@ void processes_init() {
     while (i < 0xc0000000) { // 32KiB for each process' stack section
         uint32_t pti = (uint32_t)i >> 22; // Page table index
         uint32_t pi = ((uint32_t)i >> 12) & 0x3ff; // Page index
-        if (!init->page_directory->tables[pti]) create_page_table(init->page_directory, pti, 0, 1); // User-mode page table
+        if (!init->page_directory->tables[pti]) {
+            physaddr_t phys;
+            init->page_directory->tables[pti] = (page_table_t *)kcalloc_ap(sizeof(page_table_t), &phys);
+            init->page_directory->tables_physical[pti] = phys | 0x7;
+        }
         alloc_frame(&init->page_directory->tables[pti]->pages[pi], 0, 1);
         i += 0x1000; // Increment pointer
     }
@@ -71,6 +79,7 @@ void launch_init() {
     first_node->next = NULL;
     endof_ready_queue = first_node;
     ready_queue = first_node;
+    context_switch();
 }
 
 /* Perform a context switch.
@@ -94,14 +103,24 @@ void context_switch() {
     ready_queue = ready_queue->next;
     endof_ready_queue->next = NULL;
     // Switch to the next task
-    asm volatile("cli");
-    switch_page_directory(current_process->page_directory);
-    asm volatile("mov %0, %%ecx" : : "r"(current_process->eip));
-    asm volatile("mov %0, %%ebp" : : "r"(current_process->ebp));
-    asm volatile("mov %0, %%esp" : : "r"(current_process->esp));
-    asm volatile("mov $0xdeadc0de, %eax");
-    asm volatile("sti");
-    asm volatile("jmp *%ecx");
+    // asm volatile("cli");
+    // switch_page_directory(current_process->page_directory);
+    // asm volatile("mov %0, %%ecx" : : "r"(current_process->eip));
+    // asm volatile("mov %0, %%ebp" : : "r"(current_process->ebp));
+    // asm volatile("mov %0, %%esp" : : "r"(current_process->esp));
+    // asm volatile("mov $0xdeadc0de, %eax");
+    // asm volatile("sti");
+    // asm volatile("jmp *%ecx");
+    asm volatile("              \
+        cli;                    \
+        mov %0, %%ecx;          \
+        mov %1, %%esp;          \
+        mov %2, %%ebp;          \
+        mov %3, %%cr3;          \
+        mov $0xdeadc0de, %%eax; \
+        sti;                    \
+        jmp *%%ecx"
+        : : "r"(current_process->eip), "r"(current_process->esp), "r"(current_process->ebp), "r"(current_process->page_directory->physical_addr));
 }
 
 /* Fork POSIX call: create a new process.

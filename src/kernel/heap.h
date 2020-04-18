@@ -32,9 +32,9 @@ typedef struct {
 // Heap
 typedef struct {
     ordered_array_t index; // Heap blocks
-    void *start_addr;
-    void *end_addr;
-    void *max_addr;
+    uint32_t start_addr;
+    uint32_t end_addr;
+    uint32_t max_addr;
     uint8_t supervisor;
     uint8_t readonly;
 } heap_t;

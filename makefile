@@ -16,7 +16,7 @@ SECOND_STAGE_BL_SECTORS_SIZE = $$((($(SECOND_STAGE_BL_SIZE)+511)/512)) # Compute
 SH = bash
 SFLAGS = -i
 CC = i386-elf-gcc
-CFLAGS = -g -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror
+CFLAGS = -m32 -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs -Wall -Wextra -Werror
 LD = i386-elf-ld
 
 RAM_SIZE = 128 # RAM size in MB
