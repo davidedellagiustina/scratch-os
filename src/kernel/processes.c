@@ -65,7 +65,7 @@ void processes_init() {
             init->page_directory->tables[pti] = (page_table_t *)kcalloc_ap(sizeof(page_table_t), &phys);
             init->page_directory->tables_physical[pti] = phys | 0x7;
         }
-        alloc_frame(&init->page_directory->tables[pti]->pages[pi], 0, 1);
+        alloc_frame(&(init->page_directory->tables[pti]->pages[pi]), 0, 1);
         i += 0x1000; // Increment pointer
     }
     asm volatile ("sti"); // Re-enable interrupts
@@ -74,12 +74,21 @@ void processes_init() {
 /* Launch the init process.
  */
 void launch_init() {
+    asm volatile("cli");
     ready_queue_node_t *first_node = kmalloc(sizeof(ready_queue_node_t));
     first_node->process = init;
     first_node->next = NULL;
     endof_ready_queue = first_node;
     ready_queue = first_node;
-    context_switch();
+    current_process = init;
+    asm volatile("              \
+        mov %0, %%ecx;          \
+        mov %1, %%ebp;          \
+        mov %2, %%esp;          \
+        mov %3, %%cr3;          \
+        sti;                    \
+        jmp *%%ecx"
+        : : "r"(init->eip), "r"(init->ebp), "r"(init->esp), "r"(init->page_directory->physical_addr));
 }
 
 /* Perform a context switch.
@@ -103,24 +112,14 @@ void context_switch() {
     ready_queue = ready_queue->next;
     endof_ready_queue->next = NULL;
     // Switch to the next task
-    // asm volatile("cli");
-    // switch_page_directory(current_process->page_directory);
-    // asm volatile("mov %0, %%ecx" : : "r"(current_process->eip));
-    // asm volatile("mov %0, %%ebp" : : "r"(current_process->ebp));
-    // asm volatile("mov %0, %%esp" : : "r"(current_process->esp));
-    // asm volatile("mov $0xdeadc0de, %eax");
-    // asm volatile("sti");
-    // asm volatile("jmp *%ecx");
-    asm volatile("              \
-        cli;                    \
-        mov %0, %%ecx;          \
-        mov %1, %%esp;          \
-        mov %2, %%ebp;          \
-        mov %3, %%cr3;          \
-        mov $0xdeadc0de, %%eax; \
-        sti;                    \
-        jmp *%%ecx"
-        : : "r"(current_process->eip), "r"(current_process->esp), "r"(current_process->ebp), "r"(current_process->page_directory->physical_addr));
+    asm volatile("cli");
+    switch_page_directory(current_process->page_directory);
+    asm volatile("mov %0, %%ecx" : : "r"(current_process->eip));
+    asm volatile("mov %0, %%ebp" : : "r"(current_process->ebp));
+    asm volatile("mov %0, %%esp" : : "r"(current_process->esp));
+    asm volatile("mov $0xdeadc0de, %eax");
+    asm volatile("sti");
+    asm volatile("jmp *%ecx");
 }
 
 /* Fork POSIX call: create a new process.

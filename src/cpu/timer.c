@@ -13,7 +13,7 @@ extern void context_switch();
  */
 static void timer_callback(registers_t *r) {
     ++tick;
-    // context_switch(); // Schedule a new process
+    context_switch(); // Schedule a new process
     (void)(r); // Unused parameter
 }
 

@@ -52,12 +52,12 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     kheap_init();
     kprint(" Done!\n");
     // Setup scheduling queue
-    kprint("Setting up scheduling queue and structures...");
-    processes_init();
-    kprint(" Done!\n");
+    // kprint("Setting up scheduling queue and structures...");
+    // processes_init();
+    // kprint(" Done!\n");
     // Launch init process
-    kprint("Launching the init process...");
-    launch_init(); // Activate scheduler (init will be started)
+    // kprint("Launching the init process...");
+    // launch_init(); // Activate scheduler (init will be started)
 
     // Shutdown code
     // clear_screen();

@@ -4,20 +4,6 @@
 
 #include "heap.h"
 
-// void print_ordered_array(ordered_array_t *array) {
-//     kprint("Ordered array: [\n");
-//     uint32_t i = 0;
-//     for (i = 0; i < array->size; ++i) {
-//         heap_header_t *h = (heap_header_t *)get_ordered_array(array, i);
-//         char b[50]; itoa(h->magic, b, 16);
-//         kprint("  Magic: 0x"); kprint(b); kprint(", ");
-//         kprint("hole: "); kprint((h->is_hole? "yes" : "no")); kprint(", ");
-//         itoa(h->size, b, 16);
-//         kprint("size: 0x"); kprint(b); kprint("\n");
-//     }
-//     kprint("]\n");
-// }
-
 void *kernel_brk = (void *)0xc00f0000; // Virtual, aligned, after end of VGA/ROM memory (0xa0000 - 0xfffff)
 heap_t *kernel_heap; // Kernel heap
 
