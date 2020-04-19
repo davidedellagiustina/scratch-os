@@ -14,5 +14,7 @@ src/libc/*.o
 
 src/data_structures/*.o
 
+src/programs/*.o
+
 out/os-image.bin
 out/floppy.img

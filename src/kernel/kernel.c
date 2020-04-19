@@ -59,15 +59,8 @@ void kmain(void *kvs, void *kve, physaddr_t kps, physaddr_t kpe) {
     // kprint("Launching the init process...");
     // launch_init(); // Activate scheduler (init will be started)
 
-    // Shutdown code
-    // clear_screen();
-    // kprint("Shutting down the system...");
-    // outw(0x604, 0x2000); // QEMU specific instuction for shutdown
-    // outw(0xb004, 0x2000); // QEMU (<2.0), Bochs
-    // outw(0x4004, 0x3400); // Virtualbox
-
     // TEMP: Basic shell-like interface here
-    // clear_screen();
-    // print_ascii_art();
-    // kprint("\n\n> ");
+    clear_screen();
+    print_ascii_art();
+    kprint("\n\n> ");
 }
