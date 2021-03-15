@@ -1,6 +1,6 @@
 # ScratchOS
 
-ScratchOS is a tiny operating system developed for learning purposes. It is currently under development.
+ScratchOS is a tiny operating system developed for learning purposes. It was firstly developed as a school project but it is currently not being mainteined.
 
 ![Main screen](imgs/main.png)
 
